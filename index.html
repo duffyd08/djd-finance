@@ -56,6 +56,143 @@
   .add-btn:hover { border-color: var(--accent); color: var(--accent2); }
 
   /* STAT CARDS */
+  /* UNALLOCATED BANNER */
+  .unalloc-banner {
+    background: linear-gradient(135deg, #1a1730, #1e1f2e);
+    border: 1px solid #3a3566;
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    text-align: center;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .unalloc-banner.over {
+    background: linear-gradient(135deg, #2a1414, #2e1717);
+    border-color: #6b2a2a;
+  }
+  .unalloc-banner.healthy {
+    background: linear-gradient(135deg, #0f2418, #122a1c);
+    border-color: #1f5c3a;
+  }
+  .unalloc-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .unalloc-val {
+    font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800;
+    line-height: 1; color: var(--accent2); transition: color 0.3s;
+  }
+  .unalloc-banner.over .unalloc-val { color: var(--red); }
+  .unalloc-banner.healthy .unalloc-val { color: var(--green); }
+  .unalloc-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  .save-period-btn {
+    margin-top: 14px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .save-period-btn:hover { opacity: 0.85; }
+
+  /* LEFTOVER BANK */
+  .bank-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 22px;
+  }
+  .bank-row { display: flex; align-items: center; justify-content: space-between; }
+  .bank-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+  .bank-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .bank-val { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; color: var(--green); }
+  .bank-val.negative { color: var(--red); }
+  .bank-actions { display: flex; gap: 10px; margin-top: 12px; }
+  .bank-btn {
+    flex: 1; padding: 10px; border-radius: var(--radius-sm); border: none;
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
+    background: var(--surface2); color: var(--text); border: 1px solid var(--border); transition: border-color 0.15s;
+  }
+  .bank-btn:hover { border-color: var(--accent); }
+  .bank-btn.secondary { color: var(--muted); }
+
+  /* HISTORY LIST */
+  .history-item {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px; margin-bottom: 10px;
+  }
+  .history-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .history-date { font-size: 14px; font-weight: 700; }
+  .history-leftover { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+  .history-leftover.negative { color: var(--red); }
+  .history-leftover.positive { color: var(--green); }
+  .history-details { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .history-delete {
+    background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 12px;
+    margin-top: 8px; text-decoration: underline;
+  }
+  .history-delete:hover { color: var(--red); }
+
+  /* WISHLIST */
+  .wish-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+  .wish-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .wish-header h3 { font-size: 14px; font-weight: 600; }
+  .wish-count { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .wish-add-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .wish-add-btn {
+    background: var(--accent); color: white; border: none; border-radius: var(--radius-sm);
+    padding: 10px 16px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  }
+  .wish-add-btn:hover { opacity: 0.85; }
+  .wish-item {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+    margin-bottom: 8px; transition: border-color 0.15s;
+  }
+  .wish-item.can-buy { border-color: rgba(52,211,153,0.4); }
+  .wish-item.can-buy-bank { border-color: rgba(251,191,36,0.4); }
+  .wish-item.cant-buy { border-color: var(--border); }
+  .wish-item.bought { opacity: 0.5; }
+  .wish-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .wish-status.green { background: var(--green); }
+  .wish-status.yellow { background: var(--yellow); }
+  .wish-status.red { background: var(--red); }
+  .wish-status.grey { background: var(--muted); }
+  .wish-info { flex: 1; }
+  .wish-name { font-size: 14px; font-weight: 600; }
+  .wish-name.done { text-decoration: line-through; color: var(--muted); }
+  .wish-plan { font-size: 11px; margin-top: 3px; }
+  .wish-plan.green { color: var(--green); }
+  .wish-plan.yellow { color: var(--yellow); }
+  .wish-plan.red { color: var(--muted); }
+  .wish-price { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--accent2); flex-shrink: 0; }
+  .wish-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .wish-btn {
+    background: transparent; border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; color: var(--muted); transition: all 0.15s;
+  }
+  .wish-btn.buy { color: var(--green); border-color: rgba(52,211,153,0.4); }
+  .wish-btn.buy:hover { background: rgba(52,211,153,0.1); }
+  .wish-btn.del { color: var(--red); border-color: rgba(248,113,113,0.3); }
+  .wish-btn.del:hover { background: rgba(248,113,113,0.1); }
+  .wish-empty { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+
+  .toast {
+    position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-16px);
+    background: var(--green); color: #06140c; font-size: 13px; font-weight: 700;
+    padding: 10px 20px; border-radius: 20px; z-index: 2000; opacity: 0;
+    transition: all 0.3s; pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
   .stat-label { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; }
@@ -258,12 +395,14 @@
       <div class="section-label">Variable Expenses <span id="varLbl" style="color:var(--accent2);font-size:10px">(per week)</span></div>
       <div class="expense-list" id="varList">
         <div class="cat-row"><span class="cat-icon">🛒</span><span class="cat-name">Groceries</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Groceries" data-type="want" placeholder="0" /></div>
+        <div class="cat-row"><span class="cat-icon">🥗</span><span class="cat-name">Nutrition</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Nutrition" data-type="want" placeholder="0" /></div>
         <div class="cat-row"><span class="cat-icon">🍔</span><span class="cat-name">Dining Out</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Dining" data-type="want" placeholder="0" /></div>
         <div class="cat-row"><span class="cat-icon">✈️</span><span class="cat-name">Travel</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Travel" data-type="want" placeholder="0" /></div>
         <div class="cat-row"><span class="cat-icon">🎰</span><span class="cat-name">Sports Betting</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Betting" data-type="want" placeholder="0" /></div>
         <div class="cat-row"><span class="cat-icon">🏋️</span><span class="cat-name">Gym / Sports</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Fitness" data-type="want" placeholder="0" /></div>
         <div class="cat-row"><span class="cat-icon">🎉</span><span class="cat-name">Entertainment</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Entertainment" data-type="want" placeholder="0" /></div>
         <div class="cat-row"><span class="cat-icon">👕</span><span class="cat-name">Shopping</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Shopping" data-type="want" placeholder="0" /></div>
+        <div class="cat-row"><span class="cat-icon">💼</span><span class="cat-name">Business</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Business" data-type="want" placeholder="0" /></div>
       </div>
       <button class="add-btn" id="addBtn">+ Add custom category</button>
     </div>
@@ -281,6 +420,41 @@
   </div>
 
   <div class="right-panel">
+
+    <!-- UNALLOCATED BANNER -->
+    <div class="unalloc-banner" id="unallocBanner">
+      <div class="unalloc-label">Unallocated Funds</div>
+      <div class="unalloc-val" id="unallocVal">$0</div>
+      <div class="unalloc-sub" id="unallocSub">Add income and expenses to see what's left</div>
+      <button class="save-period-btn" id="savePeriodBtn">💾 Save This Period</button>
+    </div>
+
+    <!-- LEFTOVER BANK -->
+    <div class="bank-card" id="bankCard">
+      <div class="bank-row">
+        <div>
+          <div class="bank-label">Leftover Bank</div>
+          <div class="bank-sub" id="bankSub">Accumulated leftover from saved periods</div>
+        </div>
+        <div class="bank-val" id="bankVal">$0</div>
+      </div>
+      <div class="bank-actions" id="bankActions" style="display:none">
+        <button class="bank-btn" id="useFromBankBtn">Use from bank</button>
+        <button class="bank-btn secondary" id="viewHistoryBtn">View history</button>
+      </div>
+    </div>
+
+    <!-- HISTORY MODAL -->
+    <div class="modal-overlay" id="historyModal">
+      <div class="modal">
+        <div class="modal-title">📊 Pay Period History</div>
+        <div class="modal-sub">Snapshots of your saved pay periods, most recent first.</div>
+        <div id="historyList"></div>
+        <div class="modal-actions">
+          <button class="modal-btn secondary" id="closeHistoryBtn">Close</button>
+        </div>
+      </div>
+    </div>
 
     <!-- STATS -->
     <div class="stats-row">
@@ -352,8 +526,24 @@
       <div class="goal-months" id="goalMonths"></div>
     </div>
 
-    <!-- WEEKLY -->
-    <div class="week-card">
+    <!-- WISHLIST -->
+    <div class="wish-card">
+      <div class="wish-header">
+        <h3>🛍️ Wishlist</h3>
+        <span class="wish-count" id="wishCount">0 items</span>
+      </div>
+      <div class="wish-add-row">
+        <input class="form-input" type="text" id="wishName" placeholder="Item name..." style="flex:2;padding:10px 12px"/>
+        <div class="input-row" style="flex:1">
+          <span class="input-prefix">$</span>
+          <input type="number" id="wishPrice" placeholder="Price" style="font-size:14px;padding:9px 10px;background:transparent;border:none;outline:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;width:100%"/>
+        </div>
+        <button class="wish-add-btn" id="wishAddBtn">+ Add</button>
+      </div>
+      <div id="wishList"></div>
+    </div>
+
+
       <h3>📅 Weekly Spending Budget</h3>
       <div class="week-grid">
         <div class="week-col"><div class="wlbl">Week 1</div><div class="wbar-wrap"><div class="wbar" id="w1bar" style="height:0"></div></div><div class="wamt" id="w1amt">$0</div></div>
@@ -383,6 +573,7 @@
   <div class="modal">
     <div class="modal-title">📄 Import Credit Card Statement</div>
     <div class="modal-sub">Paste your CSV (Amex format: Date, Description, Amount, ..., Category) — works with raw CSV or copy-pasted from Excel/Google Sheets. Processed entirely in your browser — never saved or uploaded anywhere.</div>
+    <div class="privacy-note" style="margin-top:0;margin-bottom:14px">📅 <b>Tip:</b> Totals are applied directly as your "per pay period" amounts. Make sure your pay period toggle (Weekly / Bi-Weekly / Monthly) matches the date range of the statement you're pasting — e.g. if this CSV covers 2 weeks, switch to <b>Bi-Weekly</b> first.</div>
     <textarea id="csvInput" placeholder="Paste your CSV content here, including the header row..."></textarea>
     <div class="modal-actions">
       <button class="modal-btn secondary" id="closeImportBtn">Cancel</button>
@@ -392,6 +583,8 @@
     <div class="privacy-note">🔒 This data is processed locally in your browser only. Nothing is uploaded, stored, or sent anywhere — closing this window clears it completely.</div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 (function() {
@@ -407,6 +600,13 @@
   var COLORS = ['#6c63ff','#38bdf8','#22c55e','#fb923c','#f472b6','#facc15','#2dd4bf','#f87171','#a78bfa','#4ade80'];
 
   function fmt(n) { return '$' + Math.abs(Math.round(n)).toLocaleString(); }
+
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 2500);
+  }
 
   // MONTH LABEL
   var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -476,7 +676,29 @@
     });
 
     var rem = monthly - total;
+    var remPerPeriod = rem / cfg.perMonth;
     var savRate = monthly > 0 ? Math.round((saves / monthly) * 100) : 0;
+
+    // Update wishlist financial context
+    currentUnallocPerPeriod = remPerPeriod;
+    currentLeftoverBank = bankTotal;
+    renderWishlist();
+
+    // Unallocated banner (shown in current pay-period terms)
+    var banner = document.getElementById('unallocBanner');
+    var unallocVal = document.getElementById('unallocVal');
+    var unallocSub = document.getElementById('unallocSub');
+    unallocVal.textContent = (remPerPeriod < 0 ? '-' : '') + fmt(Math.abs(remPerPeriod));
+    if(monthly === 0 && total === 0){
+      banner.className = 'unalloc-banner';
+      unallocSub.textContent = "Add income and expenses to see what's left";
+    } else if(rem < 0){
+      banner.className = 'unalloc-banner over';
+      unallocSub.textContent = 'Over budget by ' + fmt(Math.abs(remPerPeriod)) + ' per ' + cfg.perName;
+    } else {
+      banner.className = 'unalloc-banner healthy';
+      unallocSub.textContent = fmt(remPerPeriod) + ' left per ' + cfg.perName + ' (' + fmt(rem) + '/mo)';
+    }
 
     document.getElementById('statExp').textContent = fmt(total);
     var remEl = document.getElementById('statRem');
@@ -611,9 +833,20 @@
   }
 
   // ── CSV STATEMENT IMPORT ────────────────────────────────
-  var BUDGET_CATEGORIES = ['Rent','Utilities','Subscriptions','Transport','Groceries','Dining','Travel','Betting','Fitness','Entertainment','Shopping','Savings','Investing','Retirement','Other (not counted)'];
+  var BUDGET_CATEGORIES = ['Rent','Utilities','Subscriptions','Transport','Groceries','Nutrition','Dining','Travel','Betting','Fitness','Entertainment','Shopping','Business','Savings','Investing','Retirement','Other (not counted)'];
 
-  // Map Amex categories -> our budget categories
+  // Exact-match map: if your CSV's own Category column already says one of these
+  // (case-insensitive), use it directly — this is the highest priority match.
+  var EXACT_CATEGORY_MAP = {
+    'shopping':'Shopping','utilities':'Utilities','groceries':'Groceries','rent':'Rent',
+    'dining':'Dining','nutrition':'Nutrition','business':'Business','travel':'Travel',
+    'fitness':'Fitness','entertainment':'Entertainment','subscriptions':'Subscriptions',
+    'subscription':'Subscriptions','transport':'Transport','transportation':'Transport',
+    'betting':'Betting','savings':'Savings','investing':'Investing','retirement':'Retirement'
+  };
+
+  // Map Amex categories -> our budget categories (used as fallback if your own Category
+  // column doesn't directly match one of your budget categories)
   var AMEX_CATEGORY_MAP = {
     'restaurant':'Dining','restaurants':'Dining','dining':'Dining','bar':'Dining','food':'Dining',
     'grocery':'Groceries','groceries':'Groceries','supermarket':'Groceries','merchandise & supplies-groceries':'Groceries',
@@ -624,13 +857,16 @@
     'fitness':'Fitness','gym':'Fitness','sporting goods':'Fitness',
     'rent':'Rent','mortgage':'Rent',
     'utilities':'Utilities','utility':'Utilities','phone':'Utilities','internet':'Utilities','insurance':'Utilities',
-    'gambling':'Betting','lottery':'Betting','casino':'Betting'
+    'gambling':'Betting','lottery':'Betting','casino':'Betting',
+    'business':'Business','office supplies':'Business','business services':'Business',
+    'health & wellness':'Nutrition','nutrition':'Nutrition','vitamins':'Nutrition','supplements':'Nutrition'
   };
 
   // Keyword fallback based on merchant description
   var KEYWORD_MAP = [
     [/draftkings|fanduel|betmgm|caesars|bovada|betting|sportsbook|casino/i, 'Betting'],
     [/whole foods|trader joe|safeway|kroger|wegmans|albertsons|grocery|aldi|sprouts|costco|ralphs|publix|vons/i, 'Groceries'],
+    [/gnc|vitamin shoppe|supplement|protein powder|nutrition/i, 'Nutrition'],
     [/uber eats|doordash|grubhub|postmates|restaurant|cafe|coffee|starbucks|chipotle|mcdonald|wendy|pizza|sushi|bar |grill|diner|taco|deli/i, 'Dining'],
     [/delta|united|american air|southwest|jetblue|airbnb|marriott|hilton|hyatt|expedia|hotel|airlines|booking\.com/i, 'Travel'],
     [/uber|lyft|shell|chevron|exxon|bp |valero|parking|transit|mta|tolls/i, 'Transport'],
@@ -644,17 +880,20 @@
 
   function categorizeTransaction(description, amexCategory){
     var desc = (description||'').toLowerCase();
-    var amexCat = (amexCategory||'').toLowerCase();
+    var rawCat = (amexCategory||'').trim().toLowerCase();
 
-    // 1. Try Amex category map first
+    // 1. Exact match against your own Category column (highest priority)
+    if(EXACT_CATEGORY_MAP.hasOwnProperty(rawCat)) return EXACT_CATEGORY_MAP[rawCat];
+
+    // 2. Try Amex/general category map (partial match)
     for(var key in AMEX_CATEGORY_MAP){
-      if(amexCat.indexOf(key) !== -1) return AMEX_CATEGORY_MAP[key];
+      if(rawCat.indexOf(key) !== -1) return AMEX_CATEGORY_MAP[key];
     }
-    // 2. Keyword match on description
+    // 3. Keyword match on description
     for(var i=0;i<KEYWORD_MAP.length;i++){
       if(KEYWORD_MAP[i][0].test(desc)) return KEYWORD_MAP[i][1];
     }
-    // 3. Default
+    // 4. Default
     return 'Other (not counted)';
   }
 
@@ -812,13 +1051,13 @@
       totals[t.category] = (totals[t.category]||0) + t.amount;
     });
 
-    var cfg = PERIODS[currentPeriod];
-    // category totals are in MONTHLY terms (from statement), convert to current pay period
+    // Statement totals represent actual spending for the period the statement covers.
+    // The category inputs are "per pay period" values, so insert totals directly —
+    // no conversion needed, since the statement period IS the period being entered.
     document.querySelectorAll('.cat-input').forEach(function(input){
       var cat = input.dataset.cat;
       if(totals.hasOwnProperty(cat)){
-        var perPeriodVal = totals[cat] / cfg.perMonth;
-        input.value = Math.round(perPeriodVal * 100) / 100;
+        input.value = Math.round(totals[cat] * 100) / 100;
       }
     });
 
@@ -830,7 +1069,258 @@
   }
 
 
-  wireInputs();
+  // ── LEFTOVER BANK & PAY PERIOD HISTORY ────────────────────
+  var HISTORY_KEY = 'djd_finance_history_v1';
+  var BANK_KEY = 'djd_finance_bank_v1';
+
+  function loadHistory(){ try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); }catch(e){ return []; } }
+  function saveHistory(h){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }catch(e){} }
+  function loadBank(){ try{ return parseFloat(localStorage.getItem(BANK_KEY))||0; }catch(e){ return 0; } }
+  function saveBank(v){ try{ localStorage.setItem(BANK_KEY, JSON.stringify(v)); }catch(e){} }
+
+  var payHistory = loadHistory();
+  var bankTotal = loadBank();
+
+  function renderBank(){
+    var bankValEl = document.getElementById('bankVal');
+    var bankSubEl = document.getElementById('bankSub');
+    var bankActionsEl = document.getElementById('bankActions');
+    bankValEl.textContent = (bankTotal < 0 ? '-' : '') + fmt(Math.abs(bankTotal));
+    bankValEl.className = 'bank-val' + (bankTotal < 0 ? ' negative' : '');
+    if(payHistory.length === 0){
+      bankSubEl.textContent = 'Save a pay period to start tracking';
+      bankActionsEl.style.display = 'none';
+    } else {
+      bankSubEl.textContent = payHistory.length + ' period' + (payHistory.length!==1?'s':'') + ' saved · accumulated leftover';
+      bankActionsEl.style.display = 'flex';
+    }
+  }
+
+  document.getElementById('savePeriodBtn').addEventListener('click', function(){
+    var cfg = PERIODS[currentPeriod];
+    var paycheck = parseFloat(document.getElementById('incomeInput').value) || 0;
+    var monthly = paycheck * cfg.perMonth;
+
+    var cats = {}, total = 0;
+    document.querySelectorAll('.cat-input').forEach(function(el){
+      var raw = parseFloat(el.value) || 0;
+      if(raw <= 0) return;
+      var cat = el.dataset.cat;
+      cats[cat] = (cats[cat]||0) + raw; // store as per-period values
+      total += raw * cfg.perMonth;
+    });
+
+    var rem = monthly - total;
+    var remPerPeriod = rem / cfg.perMonth;
+
+    var snapshot = {
+      date: new Date().toISOString().split('T')[0],
+      period: currentPeriod,
+      periodLabel: cfg.label,
+      income: paycheck,
+      categories: cats,
+      leftoverPerPeriod: Math.round(remPerPeriod * 100) / 100
+    };
+
+    payHistory.unshift(snapshot);
+    saveHistory(payHistory);
+
+    bankTotal += snapshot.leftoverPerPeriod;
+    saveBank(bankTotal);
+
+    renderBank();
+    toast('Period saved! ' + (snapshot.leftoverPerPeriod >= 0 ? '+' : '') + fmt(snapshot.leftoverPerPeriod) + ' added to bank');
+  });
+
+  document.getElementById('useFromBankBtn').addEventListener('click', function(){
+    var amt = prompt('How much do you want to use from your leftover bank? (Current balance: ' + fmt(bankTotal) + ')');
+    if(amt === null) return;
+    var val = parseFloat(amt);
+    if(isNaN(val) || val <= 0){ toast('Enter a valid amount'); return; }
+    bankTotal -= val;
+    saveBank(bankTotal);
+    renderBank();
+    toast(fmt(val) + ' used from bank — new balance: ' + fmt(bankTotal));
+  });
+
+  document.getElementById('viewHistoryBtn').addEventListener('click', function(){
+    renderHistoryList();
+    document.getElementById('historyModal').classList.add('open');
+  });
+  document.getElementById('closeHistoryBtn').addEventListener('click', function(){
+    document.getElementById('historyModal').classList.remove('open');
+  });
+  document.getElementById('historyModal').addEventListener('click', function(e){
+    if(e.target === this) this.classList.remove('open');
+  });
+
+  function renderHistoryList(){
+    var listEl = document.getElementById('historyList');
+    if(payHistory.length === 0){
+      listEl.innerHTML = '<div class="privacy-note">No saved periods yet.</div>';
+      return;
+    }
+    listEl.innerHTML = payHistory.map(function(h, idx){
+      var catLines = Object.keys(h.categories).map(function(c){
+        return c + ': $' + h.categories[c].toFixed(2);
+      }).join(' · ');
+      var leftoverClass = h.leftoverPerPeriod >= 0 ? 'positive' : 'negative';
+      return '<div class="history-item">' +
+        '<div class="history-item-top">' +
+          '<span class="history-date">' + h.date + ' (' + h.periodLabel + ')</span>' +
+          '<span class="history-leftover ' + leftoverClass + '">' + (h.leftoverPerPeriod>=0?'+':'') + fmt(h.leftoverPerPeriod) + '</span>' +
+        '</div>' +
+        '<div class="history-details">Income: ' + fmt(h.income) + ' · ' + (catLines || 'No expenses logged') + '</div>' +
+        '<button class="history-delete" data-idx="' + idx + '">Delete this entry</button>' +
+      '</div>';
+    }).join('');
+
+    listEl.querySelectorAll('.history-delete').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx = parseInt(this.dataset.idx);
+        var removed = payHistory[idx];
+        bankTotal -= removed.leftoverPerPeriod;
+        payHistory.splice(idx, 1);
+        saveHistory(payHistory);
+        saveBank(bankTotal);
+        renderBank();
+        renderHistoryList();
+        toast('Entry deleted');
+      });
+    });
+  }
+
+  renderBank();
+
+
+  // ── WISHLIST ──────────────────────────────────────────────
+  var WISH_KEY = 'djd_finance_wishlist_v1';
+  function loadWishlist(){ try{ return JSON.parse(localStorage.getItem(WISH_KEY)||'[]'); }catch(e){ return []; } }
+  function saveWishlist(){ try{ localStorage.setItem(WISH_KEY, JSON.stringify(wishlist)); }catch(e){} }
+
+  var wishlist = loadWishlist();
+
+  // current financial context — updated by runUpdate so wishlist can use it
+  var currentUnallocPerPeriod = 0;
+  var currentLeftoverBank = 0;
+
+  function renderWishlist(){
+    var listEl = document.getElementById('wishList');
+    var countEl = document.getElementById('wishCount');
+    var active = wishlist.filter(function(w){ return !w.bought; });
+    countEl.textContent = active.length + ' item' + (active.length!==1?'s':'');
+
+    if(wishlist.length === 0){
+      listEl.innerHTML = '<div class="wish-empty">No items yet — add something you want to save up for!</div>';
+      return;
+    }
+
+    listEl.innerHTML = wishlist.map(function(item, idx){
+      var price = item.price;
+      var canBuyNow = currentUnallocPerPeriod >= price;
+      var canBuyBank = !canBuyNow && (currentLeftoverBank >= price);
+      var periodsNeeded = 0;
+      var planText = '';
+      var statusClass = 'grey';
+      var itemClass = 'cant-buy';
+      var planClass = 'red';
+
+      if(item.bought){
+        planText = 'Purchased ✓';
+        statusClass = 'grey';
+        itemClass = '';
+        planClass = 'grey';
+      } else if(canBuyNow){
+        planText = 'You can buy this now from current unallocated funds!';
+        statusClass = 'green'; itemClass = 'can-buy'; planClass = 'green';
+      } else if(canBuyBank){
+        planText = 'You can buy this from your leftover bank (' + fmt(currentLeftoverBank) + ' available)';
+        statusClass = 'yellow'; itemClass = 'can-buy-bank'; planClass = 'yellow';
+      } else {
+        var shortfall = price - currentLeftoverBank;
+        if(currentUnallocPerPeriod > 0){
+          periodsNeeded = Math.ceil(shortfall / currentUnallocPerPeriod);
+          var cfg = PERIODS[currentPeriod];
+          planText = 'Save for ' + periodsNeeded + ' ' + cfg.perName + (periodsNeeded!==1?'s':'') + ' at your current rate to afford this';
+        } else {
+          planText = 'Enter your income and expenses to see a savings plan';
+        }
+        statusClass = 'red'; itemClass = 'cant-buy'; planClass = 'red';
+      }
+
+      return '<div class="wish-item '+itemClass+(item.bought?' bought':'')+'">'+
+        '<div class="wish-status '+statusClass+'"></div>'+
+        '<div class="wish-info">'+
+          '<div class="wish-name'+(item.bought?' done':'')+'">'+escapeHtml(item.name)+'</div>'+
+          '<div class="wish-plan '+planClass+'">'+planText+'</div>'+
+        '</div>'+
+        '<div class="wish-price">'+fmt(price)+'</div>'+
+        '<div class="wish-actions">'+
+          (!item.bought ? '<button class="wish-btn buy" data-idx="'+idx+'">✓ Buy</button>' : '')+
+          '<button class="wish-btn del" data-idx="'+idx+'" data-action="del">✕</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    // wire buy and delete buttons
+    listEl.querySelectorAll('.wish-btn.buy').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx = parseInt(this.dataset.idx);
+        var item = wishlist[idx];
+        var confirmBuy = confirm('Mark "'+item.name+'" as purchased for '+fmt(item.price)+'?\n\nDeduct from leftover bank? (Cancel = no deduction)');
+        if(confirmBuy === null) return;
+        wishlist[idx].bought = true;
+        // offer to deduct from bank
+        if(confirmBuy && currentLeftoverBank >= item.price){
+          bankTotal -= item.price;
+          saveBank(bankTotal);
+          renderBank();
+          toast(fmt(item.price)+' deducted from leftover bank');
+        }
+        saveWishlist();
+        renderWishlist();
+      });
+    });
+
+    listEl.querySelectorAll('.wish-btn.del').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx = parseInt(this.dataset.idx);
+        wishlist.splice(idx, 1);
+        saveWishlist();
+        renderWishlist();
+        toast('Item removed');
+      });
+    });
+  }
+
+  function escapeHtml(str){
+    var d = document.createElement('div'); d.textContent = str; return d.innerHTML;
+  }
+
+  document.getElementById('wishAddBtn').addEventListener('click', function(){
+    var name = document.getElementById('wishName').value.trim();
+    var price = parseFloat(document.getElementById('wishPrice').value);
+    if(!name){ toast('Enter an item name'); return; }
+    if(!price || price <= 0){ toast('Enter a valid price'); return; }
+    wishlist.push({ name: name, price: price, bought: false, added: new Date().toISOString().split('T')[0] });
+    saveWishlist();
+    document.getElementById('wishName').value = '';
+    document.getElementById('wishPrice').value = '';
+    renderWishlist();
+    toast(name + ' added to wishlist!');
+  });
+
+  // allow Enter key in wishName to add
+  document.getElementById('wishName').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') document.getElementById('wishAddBtn').click();
+  });
+  document.getElementById('wishPrice').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') document.getElementById('wishAddBtn').click();
+  });
+
+  renderWishlist();
+
+
   runUpdate();
 
 })();
