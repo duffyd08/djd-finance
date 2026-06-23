@@ -589,558 +589,320 @@
 <script>
 (function() {
 
-  // PERIOD CONFIG
+  // -- CONFIG ------------------------------------------------
   var PERIODS = {
-    weekly:   { label: 'Weekly',    desc: '52 paychecks/year',  perMonth: 52/12,  perName: 'week' },
-    biweekly: { label: 'Bi-Weekly', desc: '26 paychecks/year',  perMonth: 26/12,  perName: '2 weeks' },
-    monthly:  { label: 'Monthly',   desc: '12 paychecks/year',  perMonth: 1,      perName: 'month' }
+    weekly:   { label:'Weekly',    desc:'52 paychecks/year', perMonth:52/12,  perName:'week' },
+    biweekly: { label:'Bi-Weekly', desc:'26 paychecks/year', perMonth:26/12,  perName:'2 weeks' },
+    monthly:  { label:'Monthly',   desc:'12 paychecks/year', perMonth:1,      perName:'month' }
   };
   var currentPeriod = 'weekly';
-
   var COLORS = ['#6c63ff','#38bdf8','#22c55e','#fb923c','#f472b6','#facc15','#2dd4bf','#f87171','#a78bfa','#4ade80'];
 
-  function fmt(n) { return '$' + Math.abs(Math.round(n)).toLocaleString(); }
+  // -- STATE -------------------------------------------------
+  var currentUnallocPerPeriod = 0;
+  var currentLeftoverBank = 0;
 
+  // -- STORAGE -----------------------------------------------
+  var HISTORY_KEY = 'djd_finance_history_v1';
+  var BANK_KEY    = 'djd_finance_bank_v1';
+  var WISH_KEY    = 'djd_finance_wishlist_v1';
+  function loadHistory(){ try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); }catch(e){ return []; } }
+  function saveHistory(h){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }catch(e){} }
+  function loadBank(){ try{ return parseFloat(localStorage.getItem(BANK_KEY))||0; }catch(e){ return 0; } }
+  function saveBank(v){ try{ localStorage.setItem(BANK_KEY, String(v)); }catch(e){} }
+  function loadWishlist(){ try{ return JSON.parse(localStorage.getItem(WISH_KEY)||'[]'); }catch(e){ return []; } }
+  function saveWishlist(){ try{ localStorage.setItem(WISH_KEY, JSON.stringify(wishlist)); }catch(e){} }
+  var payHistory = loadHistory();
+  var bankTotal  = loadBank();
+  var wishlist   = loadWishlist();
+
+  // -- HELPERS -----------------------------------------------
+  function fmt(n){ return '$' + Math.abs(Math.round(n)).toLocaleString(); }
+  function escapeHtml(str){ var d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
   function toast(msg){
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    var t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
     setTimeout(function(){ t.classList.remove('show'); }, 2500);
   }
 
-  // MONTH LABEL
-  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('monthLabel').textContent = months[new Date().getMonth()] + ' ' + new Date().getFullYear();
+  // -- MONTH LABEL -------------------------------------------
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('monthLabel').textContent = months[new Date().getMonth()]+' '+new Date().getFullYear();
 
-  // PERIOD BUTTONS
-  function setPeriod(p) {
+  // -- PERIOD TOGGLE -----------------------------------------
+  function setPeriod(p){
     currentPeriod = p;
     var cfg = PERIODS[p];
-    ['weekly','biweekly','monthly'].forEach(function(id) {
-      document.getElementById('btn-' + id).classList.toggle('active', id === p);
+    ['weekly','biweekly','monthly'].forEach(function(id){
+      document.getElementById('btn-'+id).classList.toggle('active', id===p);
     });
-    document.getElementById('periodInfo').innerHTML = '<b>' + cfg.label + '</b> &nbsp;&middot;&nbsp; ' + cfg.desc;
-    var lbl = '(per ' + cfg.perName + ')';
+    document.getElementById('periodInfo').innerHTML = '<b>'+cfg.label+'</b> &nbsp;&middot;&nbsp; '+cfg.desc;
+    var lbl = '(per '+cfg.perName+')';
     document.getElementById('fixedLbl').textContent = lbl;
-    document.getElementById('varLbl').textContent = lbl;
-    document.getElementById('savLbl').textContent = lbl;
+    document.getElementById('varLbl').textContent   = lbl;
+    document.getElementById('savLbl').textContent   = lbl;
     runUpdate();
   }
+  document.getElementById('btn-weekly').addEventListener('click',   function(){ setPeriod('weekly'); });
+  document.getElementById('btn-biweekly').addEventListener('click', function(){ setPeriod('biweekly'); });
+  document.getElementById('btn-monthly').addEventListener('click',  function(){ setPeriod('monthly'); });
 
-  document.getElementById('btn-weekly').addEventListener('click', function() { setPeriod('weekly'); });
-  document.getElementById('btn-biweekly').addEventListener('click', function() { setPeriod('biweekly'); });
-  document.getElementById('btn-monthly').addEventListener('click', function() { setPeriod('monthly'); });
-
-  // ADD CATEGORY
-  document.getElementById('addBtn').addEventListener('click', function() {
+  // -- ADD CUSTOM CATEGORY -----------------------------------
+  document.getElementById('addBtn').addEventListener('click', function(){
     var name = prompt('Category name:');
-    if (!name) return;
+    if(!name) return;
     var icon = prompt('Emoji icon (e.g. 🛍️):') || '📦';
     var row = document.createElement('div');
     row.className = 'cat-row';
-    row.innerHTML = '<span class="cat-icon">' + icon + '</span><span class="cat-name">' + name + '</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="' + name + '" data-type="want" placeholder="0" />';
+    row.innerHTML = '<span class="cat-icon">'+icon+'</span><span class="cat-name">'+name+'</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="'+name+'" data-type="want" placeholder="0" />';
     document.getElementById('varList').appendChild(row);
     row.querySelector('input').addEventListener('input', runUpdate);
   });
 
-  // WIRE ALL INPUTS
-  function wireInputs() {
-    document.querySelectorAll('.cat-input, #incomeInput, #goalInput, #savedInput').forEach(function(el) {
+  // -- WIRE INPUTS -------------------------------------------
+  function wireInputs(){
+    document.querySelectorAll('.cat-input, #incomeInput, #goalInput, #savedInput').forEach(function(el){
       el.addEventListener('input', runUpdate);
     });
   }
 
-  // MAIN UPDATE
-  function runUpdate() {
+  // -- MAIN UPDATE -------------------------------------------
+  function runUpdate(){
     var cfg = PERIODS[currentPeriod];
     var paycheck = parseFloat(document.getElementById('incomeInput').value) || 0;
-    var monthly = paycheck * cfg.perMonth;
-    var annual = paycheck * (cfg.perMonth * 12);
+    var monthly  = paycheck * cfg.perMonth;
+    var annual   = paycheck * cfg.perMonth * 12;
 
     document.getElementById('incomeDisplay').textContent = fmt(paycheck);
-    document.getElementById('incomeSub').textContent = 'per paycheck · ' + fmt(monthly) + '/mo · ' + fmt(annual) + '/yr';
-    document.getElementById('statIncome').textContent = fmt(monthly);
-    document.getElementById('statIncomeSub').textContent = fmt(annual) + '/year';
+    document.getElementById('incomeSub').textContent     = 'per paycheck · '+fmt(monthly)+'/mo · '+fmt(annual)+'/yr';
+    document.getElementById('statIncome').textContent    = fmt(monthly);
+    document.getElementById('statIncomeSub').textContent = fmt(annual)+'/year';
 
-    var cats = {}, needs = 0, wants = 0, saves = 0, total = 0;
-    document.querySelectorAll('.cat-input').forEach(function(el) {
-      var val = (parseFloat(el.value) || 0) * cfg.perMonth;
-      if (val <= 0) return;
-      var cat = el.dataset.cat;
-      var type = el.dataset.type;
-      cats[cat] = (cats[cat] || 0) + val;
-      total += val;
-      if (type === 'need') needs += val;
-      else if (type === 'save') saves += val;
-      else wants += val;
+    var cats={}, needs=0, wants=0, saves=0, total=0;
+    document.querySelectorAll('.cat-input').forEach(function(el){
+      var val = (parseFloat(el.value)||0) * cfg.perMonth;
+      if(val<=0) return;
+      var cat=el.dataset.cat, type=el.dataset.type;
+      cats[cat]=(cats[cat]||0)+val;
+      total+=val;
+      if(type==='need') needs+=val;
+      else if(type==='save') saves+=val;
+      else wants+=val;
     });
 
-    var rem = monthly - total;
-    var remPerPeriod = rem / cfg.perMonth;
-    var savRate = monthly > 0 ? Math.round((saves / monthly) * 100) : 0;
+    var rem          = monthly - total;
+    var remPerPeriod = monthly > 0 ? rem / cfg.perMonth : 0;
+    var savRate      = monthly > 0 ? Math.round((saves/monthly)*100) : 0;
 
-    // Update wishlist financial context
+    // Update shared state for wishlist
     currentUnallocPerPeriod = remPerPeriod;
-    currentLeftoverBank = bankTotal;
-    renderWishlist();
+    currentLeftoverBank     = bankTotal;
 
-    // Unallocated banner (shown in current pay-period terms)
-    var banner = document.getElementById('unallocBanner');
+    // Unallocated banner
+    var banner     = document.getElementById('unallocBanner');
     var unallocVal = document.getElementById('unallocVal');
     var unallocSub = document.getElementById('unallocSub');
-    unallocVal.textContent = (remPerPeriod < 0 ? '-' : '') + fmt(Math.abs(remPerPeriod));
-    if(monthly === 0 && total === 0){
-      banner.className = 'unalloc-banner';
+    unallocVal.textContent = (remPerPeriod<0?'-':'')+fmt(Math.abs(remPerPeriod));
+    if(monthly===0 && total===0){
+      banner.className    = 'unalloc-banner';
       unallocSub.textContent = "Add income and expenses to see what's left";
-    } else if(rem < 0){
-      banner.className = 'unalloc-banner over';
-      unallocSub.textContent = 'Over budget by ' + fmt(Math.abs(remPerPeriod)) + ' per ' + cfg.perName;
+    } else if(rem<0){
+      banner.className    = 'unalloc-banner over';
+      unallocSub.textContent = 'Over budget by '+fmt(Math.abs(remPerPeriod))+' per '+cfg.perName;
     } else {
-      banner.className = 'unalloc-banner healthy';
-      unallocSub.textContent = fmt(remPerPeriod) + ' left per ' + cfg.perName + ' (' + fmt(rem) + '/mo)';
+      banner.className    = 'unalloc-banner healthy';
+      unallocSub.textContent = fmt(remPerPeriod)+' left per '+cfg.perName+' ('+fmt(rem)+'/mo)';
     }
 
+    // Stat cards
     document.getElementById('statExp').textContent = fmt(total);
     var remEl = document.getElementById('statRem');
     remEl.textContent = fmt(Math.abs(rem));
-    remEl.className = 'stat-val ' + (rem >= 0 ? 'c-green' : 'c-red');
-    document.getElementById('statRemLbl').textContent = rem >= 0 ? 'left over / mo' : 'OVER BUDGET';
-    document.getElementById('statSavRate').textContent = savRate + '%';
+    remEl.className   = 'stat-val '+(rem>=0?'c-green':'c-red');
+    document.getElementById('statRemLbl').textContent = rem>=0?'left over / mo':'OVER BUDGET';
+    document.getElementById('statSavRate').textContent = savRate+'%';
 
-    var np = monthly > 0 ? Math.min(100, Math.round(needs/monthly*100)) : 0;
-    var wp = monthly > 0 ? Math.min(100, Math.round(wants/monthly*100)) : 0;
-    var sp = monthly > 0 ? Math.min(100, Math.round(saves/monthly*100)) : 0;
-    document.getElementById('needsBar').style.width = np + '%';
-    document.getElementById('wantsBar').style.width = wp + '%';
-    document.getElementById('savBar').style.width = sp + '%';
-    document.getElementById('needsPct').textContent = np + '%';
-    document.getElementById('wantsPct').textContent = wp + '%';
-    document.getElementById('savPct').textContent = sp + '%';
+    // Health bars
+    var needsPct = monthly>0 ? Math.min(100,Math.round((needs/monthly)*100)) : 0;
+    var wantsPct = monthly>0 ? Math.min(100,Math.round((wants/monthly)*100)) : 0;
+    var savPct   = monthly>0 ? Math.min(100,Math.round((saves/monthly)*100)) : 0;
+    document.getElementById('needsBar').style.width  = needsPct+'%';
+    document.getElementById('wantsBar').style.width  = wantsPct+'%';
+    document.getElementById('savBar').style.width    = savPct+'%';
+    document.getElementById('needsPct').textContent  = needsPct+'%';
+    document.getElementById('wantsPct').textContent  = wantsPct+'%';
+    document.getElementById('savPct').textContent    = savPct+'%';
 
+    // Health badge
     var badge = document.getElementById('healthBadge');
-    if (monthly === 0 || total === 0) { badge.textContent = 'No data'; badge.className = 'badge badge-yellow'; }
-    else if (rem < 0) { badge.textContent = 'Over Budget'; badge.className = 'badge badge-red'; }
-    else if (savRate < 10) { badge.textContent = 'Needs Work'; badge.className = 'badge badge-yellow'; }
-    else if (savRate >= 20 && np <= 50) { badge.textContent = 'Excellent'; badge.className = 'badge badge-green'; }
-    else { badge.textContent = 'Healthy'; badge.className = 'badge badge-green'; }
+    if(monthly===0||total===0){ badge.textContent='No data';     badge.className='badge badge-yellow'; }
+    else if(rem<0){             badge.textContent='Over Budget'; badge.className='badge badge-red'; }
+    else if(savRate<10){        badge.textContent='Needs Work';  badge.className='badge badge-yellow'; }
+    else if(savRate>=20&&needsPct<=50){ badge.textContent='Excellent'; badge.className='badge badge-green'; }
+    else{                       badge.textContent='Healthy';     badge.className='badge badge-green'; }
 
-    var r50 = monthly > 0 ? Math.round(needs/monthly*100) : 0;
-    var r30 = monthly > 0 ? Math.round(wants/monthly*100) : 0;
-    var r20 = monthly > 0 ? Math.round(saves/monthly*100) : 0;
-    document.getElementById('r50').textContent = r50 + '%';
-    document.getElementById('r30').textContent = r30 + '%';
-    document.getElementById('r20').textContent = r20 + '%';
-    document.getElementById('r50bar').style.width = Math.min(100, r50/50*100) + '%';
-    document.getElementById('r30bar').style.width = Math.min(100, r30/30*100) + '%';
-    document.getElementById('r20bar').style.width = Math.min(100, r20/20*100) + '%';
+    // 50/30/20
+    var r50=monthly>0?Math.round((needs/monthly)*100):0;
+    var r30=monthly>0?Math.round((wants/monthly)*100):0;
+    var r20=monthly>0?Math.round((saves/monthly)*100):0;
+    document.getElementById('r50').textContent       = r50+'%';
+    document.getElementById('r30').textContent       = r30+'%';
+    document.getElementById('r20').textContent       = r20+'%';
+    document.getElementById('r50bar').style.width    = Math.min(100,r50/50*100)+'%';
+    document.getElementById('r30bar').style.width    = Math.min(100,r30/30*100)+'%';
+    document.getElementById('r20bar').style.width    = Math.min(100,r20/20*100)+'%';
 
+    // Donut
     renderDonut(cats, total);
-    renderWeekly(wants);
-    renderGoal(saves, monthly);
+
+    // Weekly
+    var weeklySpend = Math.round(wants/4);
+    ['w1','w2','w3','w4'].forEach(function(w){
+      document.getElementById(w+'amt').textContent = fmt(weeklySpend);
+      document.getElementById(w+'bar').style.height = (wants>0?Math.min(55,10+weeklySpend/15):0)+'px';
+    });
+
+    // Savings goal
+    updateGoal(saves);
+
+    // AI tips
     renderTips(monthly, annual, cats, needs, wants, saves, rem, r50, r30, r20, savRate, cfg);
+
+    // Wishlist
+    renderWishlist();
   }
 
-  function renderDonut(cats, total) {
-    var wrap = document.getElementById('donutWrap');
-    var entries = Object.keys(cats).filter(function(k) { return cats[k] > 0; });
-    if (entries.length === 0) {
-      wrap.innerHTML = '<div class="empty"><div class="emoji">📊</div>Enter expenses to see breakdown</div>';
+  // -- DONUT -------------------------------------------------
+  function renderDonut(cats, total){
+    var wrap    = document.getElementById('donutWrap');
+    var entries = Object.keys(cats).filter(function(k){ return cats[k]>0; });
+    if(!entries.length){
+      wrap.innerHTML='<div class="empty"><div class="emoji">📊</div>Enter expenses to see breakdown</div>';
       return;
     }
-    var R = 60, cx = 70, cy = 70, ri = 38;
-    var slices = '', legend = '';
-    var angle = -Math.PI / 2;
-    entries.forEach(function(cat, i) {
-      var val = cats[cat];
-      var color = COLORS[i % COLORS.length];
-      var frac = val / total;
-      var a2 = angle + frac * 2 * Math.PI;
-      var x1 = cx + R*Math.cos(angle), y1 = cy + R*Math.sin(angle);
-      var x2 = cx + R*Math.cos(a2),    y2 = cy + R*Math.sin(a2);
-      var ix1 = cx + ri*Math.cos(angle), iy1 = cy + ri*Math.sin(angle);
-      var ix2 = cx + ri*Math.cos(a2),    iy2 = cy + ri*Math.sin(a2);
-      var lg = frac > 0.5 ? 1 : 0;
-      slices += '<path d="M'+ix1+','+iy1+' L'+x1+','+y1+' A'+R+','+R+' 0 '+lg+' 1 '+x2+','+y2+' L'+ix2+','+iy2+' A'+ri+','+ri+' 0 '+lg+' 0 '+ix1+','+iy1+'Z" fill="'+color+'" opacity="0.9"/>';
-      legend += '<div class="legend-item"><div class="legend-dot" style="background:'+color+'"></div><span class="legend-name">'+cat+'</span><span class="legend-val">'+fmt(val)+'/mo</span></div>';
-      angle = a2;
+    var R=60,cx=70,cy=70,ri=38, slices='', legend='', angle=-Math.PI/2;
+    entries.forEach(function(cat,i){
+      var val=cats[cat], color=COLORS[i%COLORS.length], frac=val/total;
+      var a2=angle+frac*2*Math.PI;
+      var x1=cx+R*Math.cos(angle),y1=cy+R*Math.sin(angle);
+      var x2=cx+R*Math.cos(a2),y2=cy+R*Math.sin(a2);
+      var ix1=cx+ri*Math.cos(angle),iy1=cy+ri*Math.sin(angle);
+      var ix2=cx+ri*Math.cos(a2),iy2=cy+ri*Math.sin(a2);
+      var lg=frac>0.5?1:0;
+      slices+='<path d="M'+ix1+','+iy1+' L'+x1+','+y1+' A'+R+','+R+' 0 '+lg+' 1 '+x2+','+y2+' L'+ix2+','+iy2+' A'+ri+','+ri+' 0 '+lg+' 0 '+ix1+','+iy1+'Z" fill="'+color+'" opacity="0.9"/>';
+      legend+='<div class="legend-item"><div class="legend-dot" style="background:'+color+'"></div><span class="legend-name">'+cat+'</span><span class="legend-val">'+fmt(val)+'/mo</span></div>';
+      angle=a2;
     });
-    wrap.innerHTML = '<svg width="140" height="140" viewBox="0 0 140 140">'+slices+'</svg><div class="donut-legend">'+legend+'</div>';
+    wrap.innerHTML='<svg width="140" height="140" viewBox="0 0 140 140">'+slices+'</svg><div class="donut-legend">'+legend+'</div>';
   }
 
-  function renderWeekly(wants) {
-    var w = Math.round(wants / 4);
-    var h = wants > 0 ? Math.min(55, 10 + w / 15) : 0;
-    ['w1','w2','w3','w4'].forEach(function(id) {
-      document.getElementById(id+'amt').textContent = fmt(w);
-      document.getElementById(id+'bar').style.height = h + 'px';
-    });
-  }
-
-  function renderGoal(monthlySaves, monthlyIncome) {
-    var goal  = parseFloat(document.getElementById('goalInput').value) || 0;
-    var saved = parseFloat(document.getElementById('savedInput').value) || 0;
-    var pct = goal > 0 ? Math.min(100, Math.round(saved/goal*100)) : 0;
-    document.getElementById('goalFill').style.width = pct + '%';
-    document.getElementById('goalSaved').textContent = fmt(saved) + ' saved';
-    document.getElementById('goalPct').textContent = pct + '%';
-    document.getElementById('goalTarget').textContent = 'Goal: ' + fmt(goal);
-    var rem = goal - saved;
-    if (goal > 0 && monthlySaves > 0 && rem > 0) {
-      var mos = Math.ceil(rem / monthlySaves);
-      document.getElementById('goalMonths').innerHTML = 'At your savings rate, you\'ll hit your goal in <b>' + mos + ' month' + (mos !== 1 ? 's' : '') + '</b>.';
-    } else if (goal > 0 && rem <= 0) {
-      document.getElementById('goalMonths').innerHTML = '🎉 <b>Goal reached!</b>';
+  // -- SAVINGS GOAL ------------------------------------------
+  function updateGoal(monthlySaves){
+    var goal  = parseFloat(document.getElementById('goalInput').value)||0;
+    var saved = parseFloat(document.getElementById('savedInput').value)||0;
+    var pct   = goal>0?Math.min(100,Math.round((saved/goal)*100)):0;
+    document.getElementById('goalFill').style.width   = pct+'%';
+    document.getElementById('goalSaved').textContent  = fmt(saved)+' saved';
+    document.getElementById('goalPct').textContent    = pct+'%';
+    document.getElementById('goalTarget').textContent = 'Goal: '+fmt(goal);
+    var rem2 = goal-saved;
+    if(goal>0&&monthlySaves>0&&rem2>0){
+      var mos=Math.ceil(rem2/monthlySaves);
+      document.getElementById('goalMonths').innerHTML='At your savings rate you\'ll reach your goal in <b>'+mos+' month'+(mos!==1?'s':'')+'</b>.';
+    } else if(goal>0&&rem2<=0){
+      document.getElementById('goalMonths').innerHTML='🎉 <b>Goal reached!</b>';
     } else {
-      document.getElementById('goalMonths').textContent = '';
+      document.getElementById('goalMonths').textContent='';
     }
   }
 
-  function renderTips(monthly, annual, cats, needs, wants, saves, rem, r50, r30, r20, savRate, cfg) {
-    var list = document.getElementById('tipList');
-    if (monthly === 0) {
-      list.innerHTML = '<div class="empty"><div class="emoji">💡</div>Enter your income and expenses above to get personalized guidance.</div>';
+  // -- AI TIPS -----------------------------------------------
+  function renderTips(monthly, annual, cats, needs, wants, saves, rem, r50, r30, r20, savRate, cfg){
+    var list=document.getElementById('tipList');
+    if(monthly===0){
+      list.innerHTML='<div class="empty"><div class="emoji">💡</div>Enter your income and expenses to get personalized guidance.</div>';
       return;
     }
-    var tips = [];
+    var tips=[];
+    var remPP = rem/cfg.perMonth;
+    if(rem<0)            tips.push({t:'warn',i:'🚨',m:'<b>Over budget by '+fmt(Math.abs(remPP))+' per '+cfg.perName+'.</b> Cut dining, shopping, or entertainment first.'});
+    else if(rem<monthly*0.05) tips.push({t:'warn',i:'⚠️',m:'<b>Very little left ('+fmt(remPP)+'/'+cfg.perName+').</b> Keep 5-10% as a buffer for surprises.'});
+    else                 tips.push({t:'ok',i:'✅',m:'<b>'+fmt(remPP)+' unallocated per '+cfg.perName+'.</b> Move it to savings or investing to put every dollar to work.'});
 
-    if (rem < 0) tips.push({t:'warn', i:'🚨', m:'<b>Over budget by ' + fmt(Math.abs(rem)) + '/month.</b> Cut dining, shopping, or entertainment first.'});
-    else if (rem < monthly * 0.05) tips.push({t:'warn', i:'⚠️', m:'<b>Almost nothing left (' + fmt(rem) + '/mo).</b> Keep 5-10% as a buffer for surprises.'});
-    else tips.push({t:'ok', i:'✅', m:'<b>' + fmt(rem) + '/month unallocated.</b> Move it into savings or investing to put every dollar to work.'});
+    if(saves===0) tips.push({t:'warn',i:'💸',m:'<b>No savings set.</b> Aim for 20% — that\'s '+fmt(monthly*0.2)+'/mo or '+fmt(monthly*0.2/cfg.perMonth)+' per '+cfg.perName+'.'});
+    else if(savRate<10) tips.push({t:'info',i:'📈',m:'<b>Savings rate is '+savRate+'%</b> — below 20%. Add '+fmt((monthly*0.2-saves)/cfg.perMonth)+' per '+cfg.perName+' to hit the target.'});
+    else if(savRate>=20) tips.push({t:'ok',i:'🏆',m:'<b>Savings rate at '+savRate+'% — hitting the 20% target!</b> Consider maxing a Roth IRA ($7,000/yr = '+fmt(7000/12)+'/mo).'});
 
-    if (saves === 0) tips.push({t:'warn', i:'💸', m:'<b>No savings set.</b> Aim for 20% — that\'s ' + fmt(monthly*0.2) + '/mo or ' + fmt(monthly*0.2/cfg.perMonth) + ' per paycheck.'});
-    else if (savRate < 10) tips.push({t:'info', i:'📈', m:'<b>Savings rate is ' + savRate + '%</b> — below 20%. Add ' + fmt((monthly*0.2-saves)/cfg.perMonth) + ' per paycheck to hit the target.'});
-    else if (savRate >= 20) tips.push({t:'ok', i:'🏆', m:'<b>Savings rate at ' + savRate + '%!</b> Consider maxing a Roth IRA ($7,000/yr = ' + fmt(7000/12) + '/mo).'});
-
-    var bet = cats['Betting'] || 0;
-    if (bet > 0) {
-      var bp = Math.round(bet/monthly*100);
-      if (bp > 5) tips.push({t:'warn', i:'🎰', m:'<b>Sports betting is ' + bp + '% of income (' + fmt(bet) + '/mo).</b> Consider capping at ' + fmt(monthly*0.05) + '/month max.'});
-      else tips.push({t:'info', i:'🎰', m:'<b>Sports betting: ' + fmt(bet) + '/mo (' + bp + '%).</b> Reasonable range — track wins/losses to keep it as entertainment.'});
+    var bet=cats['Betting']||0;
+    if(bet>0){
+      var bp=Math.round((bet/monthly)*100);
+      if(bp>5) tips.push({t:'warn',i:'🎰',m:'<b>Sports betting is '+bp+'% of income ('+fmt(bet)+'/mo).</b> Consider capping at '+fmt(monthly*0.05)+'/month max.'});
+      else tips.push({t:'info',i:'🎰',m:'<b>Sports betting: '+fmt(bet)+'/mo ('+bp+'%).</b> Reasonable range — track wins/losses.'});
     }
+    if(r50>50) tips.push({t:'warn',i:'🏠',m:'<b>Needs are '+r50+'% of income — above 50% target.</b> Aim for rent under 30%: '+fmt(monthly*0.3)+'/mo.'});
+    if(r30>30) tips.push({t:'info',i:'🎯',m:'<b>Discretionary is '+r30+'% — above 30% guideline.</b> Find the top 2 categories to trim.'});
 
-    if (r50 > 50) tips.push({t:'warn', i:'🏠', m:'<b>Needs are ' + r50 + '% of income</b> — above the 50% target. Aim for rent under 30%: ' + fmt(monthly*0.3) + '/mo.'});
-    if (r30 > 30) tips.push({t:'info', i:'🎯', m:'<b>Discretionary is ' + r30 + '% — above 30% guideline.</b> Find your top 2 categories to trim.'});
+    var inv=(cats['Investing']||0)+(cats['Retirement']||0);
+    if(inv===0) tips.push({t:'blue',i:'📊',m:'<b>No investing budget.</b> Even '+fmt(monthly*0.05)+'/mo in index funds compounds massively — that\'s '+fmt(monthly*0.05/cfg.perMonth)+' per '+cfg.perName+'.'});
+    else tips.push({t:'ok',i:'📊',m:'<b>Investing '+fmt(inv)+'/mo ('+fmt(inv*12)+'/yr).</b> Order: max 401k match → Roth IRA → taxable brokerage.'});
 
-    var inv = (cats['Investing']||0) + (cats['Retirement']||0);
-    if (inv === 0) tips.push({t:'blue', i:'📊', m:'<b>No investing budget.</b> Even ' + fmt(monthly*0.05) + '/mo in index funds compounds massively over time.'});
-    else tips.push({t:'ok', i:'📊', m:'<b>Investing ' + fmt(inv) + '/mo (' + fmt(inv*12) + '/yr).</b> Order: max 401k match → Roth IRA → taxable brokerage.'});
+    tips.push({t:'blue',i:'📅',m:'<b>Annual view:</b> '+fmt(annual)+' income · '+fmt(saves*12)+' saved · '+fmt(wants*12)+' discretionary.'});
 
-    tips.push({t:'blue', i:'📅', m:'<b>Annual view:</b> ' + fmt(annual) + ' income · ' + fmt(saves*12) + ' saved · ' + fmt(wants*12) + ' discretionary.'});
-
-    list.innerHTML = tips.map(function(t) {
-      return '<div class="tip ' + t.t + '"><span class="tip-icon">' + t.i + '</span><div class="tip-text">' + t.m + '</div></div>';
+    list.innerHTML=tips.map(function(t){
+      return '<div class="tip '+t.t+'"><span class="tip-icon">'+t.i+'</span><div class="tip-text">'+t.m+'</div></div>';
     }).join('');
   }
 
-  // ── CSV STATEMENT IMPORT ────────────────────────────────
-  var BUDGET_CATEGORIES = ['Rent','Utilities','Subscriptions','Transport','Groceries','Nutrition','Dining','Travel','Betting','Fitness','Entertainment','Shopping','Business','Savings','Investing','Retirement','Other (not counted)'];
-
-  // Exact-match map: if your CSV's own Category column already says one of these
-  // (case-insensitive), use it directly — this is the highest priority match.
-  var EXACT_CATEGORY_MAP = {
-    'shopping':'Shopping','utilities':'Utilities','groceries':'Groceries','rent':'Rent',
-    'dining':'Dining','nutrition':'Nutrition','business':'Business','travel':'Travel',
-    'fitness':'Fitness','entertainment':'Entertainment','subscriptions':'Subscriptions',
-    'subscription':'Subscriptions','transport':'Transport','transportation':'Transport',
-    'betting':'Betting','savings':'Savings','investing':'Investing','retirement':'Retirement'
-  };
-
-  // Map Amex categories -> our budget categories (used as fallback if your own Category
-  // column doesn't directly match one of your budget categories)
-  var AMEX_CATEGORY_MAP = {
-    'restaurant':'Dining','restaurants':'Dining','dining':'Dining','bar':'Dining','food':'Dining',
-    'grocery':'Groceries','groceries':'Groceries','supermarket':'Groceries','merchandise & supplies-groceries':'Groceries',
-    'travel':'Travel','airline':'Travel','airlines':'Travel','hotel':'Travel','lodging':'Travel','car rental':'Travel','transportation-travel':'Travel',
-    'gas station':'Transport','gas stations':'Transport','transportation':'Transport','parking':'Transport','rideshare':'Transport','transportation-fuel':'Transport',
-    'entertainment':'Entertainment','recreation':'Entertainment','streaming':'Subscriptions','subscription':'Subscriptions',
-    'shopping':'Shopping','retail':'Shopping','clothing':'Shopping','merchandise':'Shopping','department stores':'Shopping',
-    'fitness':'Fitness','gym':'Fitness','sporting goods':'Fitness',
-    'rent':'Rent','mortgage':'Rent',
-    'utilities':'Utilities','utility':'Utilities','phone':'Utilities','internet':'Utilities','insurance':'Utilities',
-    'gambling':'Betting','lottery':'Betting','casino':'Betting',
-    'business':'Business','office supplies':'Business','business services':'Business',
-    'health & wellness':'Nutrition','nutrition':'Nutrition','vitamins':'Nutrition','supplements':'Nutrition'
-  };
-
-  // Keyword fallback based on merchant description
-  var KEYWORD_MAP = [
-    [/draftkings|fanduel|betmgm|caesars|bovada|betting|sportsbook|casino/i, 'Betting'],
-    [/whole foods|trader joe|safeway|kroger|wegmans|albertsons|grocery|aldi|sprouts|costco|ralphs|publix|vons/i, 'Groceries'],
-    [/gnc|vitamin shoppe|supplement|protein powder|nutrition/i, 'Nutrition'],
-    [/uber eats|doordash|grubhub|postmates|restaurant|cafe|coffee|starbucks|chipotle|mcdonald|wendy|pizza|sushi|bar |grill|diner|taco|deli/i, 'Dining'],
-    [/delta|united|american air|southwest|jetblue|airbnb|marriott|hilton|hyatt|expedia|hotel|airlines|booking\.com/i, 'Travel'],
-    [/uber|lyft|shell|chevron|exxon|bp |valero|parking|transit|mta|tolls/i, 'Transport'],
-    [/netflix|spotify|hulu|disney\+|hbo|apple\.com\/bill|prime video|youtube premium|subscription/i, 'Subscriptions'],
-    [/planet fitness|equinox|la fitness|crossfit|gym|yoga|peloton/i, 'Fitness'],
-    [/amazon|target|walmart|best buy|nike|amazon\.com|nordstrom|macy|tj maxx|marshalls|zara|h&m/i, 'Shopping'],
-    [/amc|regal|cinema|movie|ticketmaster|stubhub|live nation|theatre|concert/i, 'Entertainment'],
-    [/electric|water|gas company|comcast|verizon|at&t|t-mobile|geico|state farm|allstate|insurance/i, 'Utilities'],
-    [/rent|property management|apartments/i, 'Rent']
-  ];
-
-  function categorizeTransaction(description, amexCategory){
-    var desc = (description||'').toLowerCase();
-    var rawCat = (amexCategory||'').trim().toLowerCase();
-
-    // 1. Exact match against your own Category column (highest priority)
-    if(EXACT_CATEGORY_MAP.hasOwnProperty(rawCat)) return EXACT_CATEGORY_MAP[rawCat];
-
-    // 2. Try Amex/general category map (partial match)
-    for(var key in AMEX_CATEGORY_MAP){
-      if(rawCat.indexOf(key) !== -1) return AMEX_CATEGORY_MAP[key];
-    }
-    // 3. Keyword match on description
-    for(var i=0;i<KEYWORD_MAP.length;i++){
-      if(KEYWORD_MAP[i][0].test(desc)) return KEYWORD_MAP[i][1];
-    }
-    // 4. Default
-    return 'Other (not counted)';
-  }
-
-  function parseCSV(text){
-    var lines = text.trim().split('\n');
-    if(lines.length < 2) return [];
-
-    // Auto-detect delimiter: tab (Excel paste), comma, or semicolon
-    var firstLine = lines[0];
-    var delim = ',';
-    if(firstLine.indexOf('\t') !== -1) delim = '\t';
-    else if(firstLine.split(',').length < 3 && firstLine.split(';').length >= 3) delim = ';';
-
-    // simple line parser handling quoted fields with the detected delimiter
-    function parseLine(line){
-      var fields = [], cur = '', inQuotes = false;
-      for(var i=0;i<line.length;i++){
-        var ch = line[i];
-        if(ch === '"'){ inQuotes = !inQuotes; }
-        else if(ch === delim && !inQuotes){ fields.push(cur); cur=''; }
-        else { cur += ch; }
-      }
-      fields.push(cur);
-      return fields.map(function(f){ return f.trim().replace(/^"|"$/g,'').trim(); });
-    }
-    var headers = parseLine(lines[0]).map(function(h){ return h.trim(); });
-    var dateIdx = headers.indexOf('Date');
-    var descIdx = headers.indexOf('Description');
-    var amtIdx = headers.indexOf('Amount');
-    var catIdx = headers.indexOf('Category');
-
-    if(descIdx === -1 || amtIdx === -1){
-      return null; // unrecognized format
-    }
-
-    var txns = [];
-    for(var i=1;i<lines.length;i++){
-      if(!lines[i].trim()) continue;
-      var fields = parseLine(lines[i]);
-      var amt = parseFloat((fields[amtIdx]||'').replace(/[^0-9.\-]/g,''));
-      if(isNaN(amt)) continue;
-      if(amt <= 0) continue; // skip payments/credits (negative or zero)
-      txns.push({
-        date: dateIdx!==-1 ? fields[dateIdx] : '',
-        description: fields[descIdx] || '',
-        amount: amt,
-        amexCategory: catIdx!==-1 ? fields[catIdx] : ''
-      });
-    }
-    return txns;
-  }
-
-  var parsedTxns = [];
-
-  document.getElementById('importStatementBtn').addEventListener('click', function(){
-    document.getElementById('importModal').classList.add('open');
-    document.getElementById('reviewSection').style.display = 'none';
-    document.getElementById('reviewSection').innerHTML = '';
-    document.getElementById('csvInput').value = '';
-  });
-
-  document.getElementById('closeImportBtn').addEventListener('click', function(){
-    document.getElementById('importModal').classList.remove('open');
-  });
-
-  document.getElementById('parseCsvBtn').addEventListener('click', function(){
-    var raw = document.getElementById('csvInput').value;
-    var txns = parseCSV(raw);
-    var reviewEl = document.getElementById('reviewSection');
-
-    if(!txns){
-      reviewEl.style.display = 'block';
-      reviewEl.innerHTML = '<div class="privacy-note" style="color:var(--red);margin-top:14px">Could not find "Description" and "Amount" columns. Make sure you pasted the full CSV including the header row.</div>';
-      return;
-    }
-    if(txns.length === 0){
-      reviewEl.style.display = 'block';
-      reviewEl.innerHTML = '<div class="privacy-note" style="color:var(--yellow);margin-top:14px">No charges found (only payments/credits, or empty file).</div>';
-      return;
-    }
-
-    // Auto-categorize
-    parsedTxns = txns.map(function(t){
-      return { date:t.date, description:t.description, amount:t.amount, category: categorizeTransaction(t.description, t.amexCategory) };
-    });
-
-    renderReview();
-  });
-
-  function renderReview(){
-    var reviewEl = document.getElementById('reviewSection');
-    reviewEl.style.display = 'block';
-
-    var rows = parsedTxns.map(function(t, i){
-      var opts = BUDGET_CATEGORIES.map(function(c){
-        return '<option value="'+c+'"'+(c===t.category?' selected':'')+'>'+c+'</option>';
-      }).join('');
-      return '<tr>'+
-        '<td>'+(t.date||'')+'</td>'+
-        '<td>'+escapeHtml(t.description)+'</td>'+
-        '<td class="amt">$'+t.amount.toFixed(2)+'</td>'+
-        '<td><select data-idx="'+i+'" class="cat-select">'+opts+'</select></td>'+
-        '</tr>';
-    }).join('');
-
-    reviewEl.innerHTML =
-      '<table class="review-table"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Category</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-      '<div class="review-summary" id="categorySummary"></div>'+
-      '<div class="modal-actions">'+
-        '<button class="modal-btn secondary" id="cancelReviewBtn">Cancel</button>'+
-        '<button class="modal-btn primary" id="applyCategoriesBtn">Apply to Budget</button>'+
-      '</div>';
-
-    reviewEl.querySelectorAll('.cat-select').forEach(function(sel){
-      sel.addEventListener('change', function(){
-        parsedTxns[parseInt(this.dataset.idx)].category = this.value;
-        renderCategorySummary();
-      });
-    });
-
-    document.getElementById('cancelReviewBtn').addEventListener('click', function(){
-      document.getElementById('importModal').classList.remove('open');
-    });
-
-    document.getElementById('applyCategoriesBtn').addEventListener('click', applyCategoriesToBudget);
-
-    renderCategorySummary();
-  }
-
-  function renderCategorySummary(){
-    var totals = {};
-    parsedTxns.forEach(function(t){
-      if(t.category === 'Other (not counted)') return;
-      totals[t.category] = (totals[t.category]||0) + t.amount;
-    });
-    var summaryEl = document.getElementById('categorySummary');
-    var rows = Object.keys(totals).sort().map(function(c){
-      return '<div class="review-summary-row"><span class="cat">'+c+'</span><span class="val">$'+totals[c].toFixed(2)+'</span></div>';
-    }).join('');
-    var otherCount = parsedTxns.filter(function(t){ return t.category==='Other (not counted)'; }).length;
-    summaryEl.innerHTML = '<div style="font-weight:600;margin-bottom:6px;color:var(--text)">Category Totals (will replace current values)</div>'+rows+
-      (otherCount ? '<div style="margin-top:6px;color:var(--muted);font-size:12px">'+otherCount+' transaction(s) marked "Other" — not applied to any category.</div>' : '');
-  }
-
-  function escapeHtml(str){
-    var div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-  function applyCategoriesToBudget(){
-    var totals = {};
-    parsedTxns.forEach(function(t){
-      if(t.category === 'Other (not counted)') return;
-      totals[t.category] = (totals[t.category]||0) + t.amount;
-    });
-
-    // Statement totals represent actual spending for the period the statement covers.
-    // The category inputs are "per pay period" values, so insert totals directly —
-    // no conversion needed, since the statement period IS the period being entered.
-    document.querySelectorAll('.cat-input').forEach(function(input){
-      var cat = input.dataset.cat;
-      if(totals.hasOwnProperty(cat)){
-        input.value = Math.round(totals[cat] * 100) / 100;
-      }
-    });
-
-    document.getElementById('importModal').classList.remove('open');
-    runUpdate();
-    // simple confirmation
-    var el = document.getElementById('reviewSection');
-    el.innerHTML = '';
-  }
-
-
-  // ── LEFTOVER BANK & PAY PERIOD HISTORY ────────────────────
-  var HISTORY_KEY = 'djd_finance_history_v1';
-  var BANK_KEY = 'djd_finance_bank_v1';
-
-  function loadHistory(){ try{ return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); }catch(e){ return []; } }
-  function saveHistory(h){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); }catch(e){} }
-  function loadBank(){ try{ return parseFloat(localStorage.getItem(BANK_KEY))||0; }catch(e){ return 0; } }
-  function saveBank(v){ try{ localStorage.setItem(BANK_KEY, JSON.stringify(v)); }catch(e){} }
-
-  var payHistory = loadHistory();
-  var bankTotal = loadBank();
-
+  // -- LEFTOVER BANK -----------------------------------------
   function renderBank(){
-    var bankValEl = document.getElementById('bankVal');
-    var bankSubEl = document.getElementById('bankSub');
-    var bankActionsEl = document.getElementById('bankActions');
-    bankValEl.textContent = (bankTotal < 0 ? '-' : '') + fmt(Math.abs(bankTotal));
-    bankValEl.className = 'bank-val' + (bankTotal < 0 ? ' negative' : '');
-    if(payHistory.length === 0){
-      bankSubEl.textContent = 'Save a pay period to start tracking';
-      bankActionsEl.style.display = 'none';
+    var bankValEl    = document.getElementById('bankVal');
+    var bankSubEl    = document.getElementById('bankSub');
+    var bankActionsEl= document.getElementById('bankActions');
+    bankValEl.textContent = (bankTotal<0?'-':'')+fmt(Math.abs(bankTotal));
+    bankValEl.className   = 'bank-val'+(bankTotal<0?' negative':'');
+    if(payHistory.length===0){
+      bankSubEl.textContent          = 'Save a pay period to start tracking';
+      bankActionsEl.style.display    = 'none';
     } else {
-      bankSubEl.textContent = payHistory.length + ' period' + (payHistory.length!==1?'s':'') + ' saved · accumulated leftover';
-      bankActionsEl.style.display = 'flex';
+      bankSubEl.textContent          = payHistory.length+' period'+(payHistory.length!==1?'s':'')+' saved · accumulated leftover';
+      bankActionsEl.style.display    = 'flex';
     }
   }
 
   document.getElementById('savePeriodBtn').addEventListener('click', function(){
-    var cfg = PERIODS[currentPeriod];
-    var paycheck = parseFloat(document.getElementById('incomeInput').value) || 0;
-    var monthly = paycheck * cfg.perMonth;
-
-    var cats = {}, total = 0;
+    var cfg      = PERIODS[currentPeriod];
+    var paycheck = parseFloat(document.getElementById('incomeInput').value)||0;
+    var monthly  = paycheck * cfg.perMonth;
+    var total    = 0;
+    var cats2    = {};
     document.querySelectorAll('.cat-input').forEach(function(el){
-      var raw = parseFloat(el.value) || 0;
-      if(raw <= 0) return;
-      var cat = el.dataset.cat;
-      cats[cat] = (cats[cat]||0) + raw; // store as per-period values
-      total += raw * cfg.perMonth;
+      var raw=parseFloat(el.value)||0;
+      if(raw<=0) return;
+      cats2[el.dataset.cat]=(cats2[el.dataset.cat]||0)+raw;
+      total+=raw*cfg.perMonth;
     });
-
-    var rem = monthly - total;
-    var remPerPeriod = rem / cfg.perMonth;
-
-    var snapshot = {
-      date: new Date().toISOString().split('T')[0],
-      period: currentPeriod,
-      periodLabel: cfg.label,
-      income: paycheck,
-      categories: cats,
-      leftoverPerPeriod: Math.round(remPerPeriod * 100) / 100
-    };
-
+    var rem         = monthly-total;
+    var remPerPeriod= cfg.perMonth>0 ? rem/cfg.perMonth : 0;
+    var snapshot    = { date:new Date().toISOString().split('T')[0], period:currentPeriod, periodLabel:cfg.label, income:paycheck, categories:cats2, leftoverPerPeriod:Math.round(remPerPeriod*100)/100 };
     payHistory.unshift(snapshot);
     saveHistory(payHistory);
-
-    bankTotal += snapshot.leftoverPerPeriod;
+    bankTotal+=snapshot.leftoverPerPeriod;
     saveBank(bankTotal);
-
     renderBank();
-    toast('Period saved! ' + (snapshot.leftoverPerPeriod >= 0 ? '+' : '') + fmt(snapshot.leftoverPerPeriod) + ' added to bank');
+    currentLeftoverBank=bankTotal;
+    renderWishlist();
+    toast('Period saved! '+(snapshot.leftoverPerPeriod>=0?'+':'')+fmt(snapshot.leftoverPerPeriod)+' added to bank');
   });
 
   document.getElementById('useFromBankBtn').addEventListener('click', function(){
-    var amt = prompt('How much do you want to use from your leftover bank? (Current balance: ' + fmt(bankTotal) + ')');
-    if(amt === null) return;
-    var val = parseFloat(amt);
-    if(isNaN(val) || val <= 0){ toast('Enter a valid amount'); return; }
-    bankTotal -= val;
-    saveBank(bankTotal);
-    renderBank();
-    toast(fmt(val) + ' used from bank — new balance: ' + fmt(bankTotal));
+    var amt=prompt('How much to use from your leftover bank? (Balance: '+fmt(bankTotal)+')');
+    if(amt===null) return;
+    var val=parseFloat(amt);
+    if(isNaN(val)||val<=0){ toast('Enter a valid amount'); return; }
+    bankTotal-=val; saveBank(bankTotal);
+    currentLeftoverBank=bankTotal;
+    renderBank(); renderWishlist();
+    toast(fmt(val)+' used — new balance: '+fmt(bankTotal));
   });
 
   document.getElementById('viewHistoryBtn').addEventListener('click', function(){
@@ -1151,103 +913,67 @@
     document.getElementById('historyModal').classList.remove('open');
   });
   document.getElementById('historyModal').addEventListener('click', function(e){
-    if(e.target === this) this.classList.remove('open');
+    if(e.target===this) this.classList.remove('open');
   });
 
   function renderHistoryList(){
-    var listEl = document.getElementById('historyList');
-    if(payHistory.length === 0){
-      listEl.innerHTML = '<div class="privacy-note">No saved periods yet.</div>';
-      return;
-    }
-    listEl.innerHTML = payHistory.map(function(h, idx){
-      var catLines = Object.keys(h.categories).map(function(c){
-        return c + ': $' + h.categories[c].toFixed(2);
-      }).join(' · ');
-      var leftoverClass = h.leftoverPerPeriod >= 0 ? 'positive' : 'negative';
-      return '<div class="history-item">' +
-        '<div class="history-item-top">' +
-          '<span class="history-date">' + h.date + ' (' + h.periodLabel + ')</span>' +
-          '<span class="history-leftover ' + leftoverClass + '">' + (h.leftoverPerPeriod>=0?'+':'') + fmt(h.leftoverPerPeriod) + '</span>' +
-        '</div>' +
-        '<div class="history-details">Income: ' + fmt(h.income) + ' · ' + (catLines || 'No expenses logged') + '</div>' +
-        '<button class="history-delete" data-idx="' + idx + '">Delete this entry</button>' +
+    var listEl=document.getElementById('historyList');
+    if(!payHistory.length){ listEl.innerHTML='<div class="privacy-note">No saved periods yet.</div>'; return; }
+    listEl.innerHTML=payHistory.map(function(h,idx){
+      var catLines=Object.keys(h.categories).map(function(c){ return c+': $'+h.categories[c].toFixed(2); }).join(' · ');
+      var cls=h.leftoverPerPeriod>=0?'positive':'negative';
+      return '<div class="history-item">'+
+        '<div class="history-item-top"><span class="history-date">'+h.date+' ('+h.periodLabel+')</span><span class="history-leftover '+cls+'">'+(h.leftoverPerPeriod>=0?'+':'')+fmt(h.leftoverPerPeriod)+'</span></div>'+
+        '<div class="history-details">Income: '+fmt(h.income)+' · '+(catLines||'No expenses')+'</div>'+
+        '<button class="history-delete" data-idx="'+idx+'">Delete this entry</button>'+
       '</div>';
     }).join('');
-
     listEl.querySelectorAll('.history-delete').forEach(function(btn){
       btn.addEventListener('click', function(){
-        var idx = parseInt(this.dataset.idx);
-        var removed = payHistory[idx];
-        bankTotal -= removed.leftoverPerPeriod;
-        payHistory.splice(idx, 1);
-        saveHistory(payHistory);
-        saveBank(bankTotal);
-        renderBank();
-        renderHistoryList();
+        var idx=parseInt(this.dataset.idx);
+        bankTotal-=payHistory[idx].leftoverPerPeriod;
+        payHistory.splice(idx,1);
+        saveHistory(payHistory); saveBank(bankTotal);
+        currentLeftoverBank=bankTotal;
+        renderBank(); renderHistoryList(); renderWishlist();
         toast('Entry deleted');
       });
     });
   }
 
-  renderBank();
-
-
-  // ── WISHLIST ──────────────────────────────────────────────
-  var WISH_KEY = 'djd_finance_wishlist_v1';
-  function loadWishlist(){ try{ return JSON.parse(localStorage.getItem(WISH_KEY)||'[]'); }catch(e){ return []; } }
-  function saveWishlist(){ try{ localStorage.setItem(WISH_KEY, JSON.stringify(wishlist)); }catch(e){} }
-
-  var wishlist = loadWishlist();
-
-  // current financial context — updated by runUpdate so wishlist can use it
-  var currentUnallocPerPeriod = 0;
-  var currentLeftoverBank = 0;
-
+  // -- WISHLIST ----------------------------------------------
   function renderWishlist(){
-    var listEl = document.getElementById('wishList');
+    var listEl  = document.getElementById('wishList');
     var countEl = document.getElementById('wishCount');
-    var active = wishlist.filter(function(w){ return !w.bought; });
-    countEl.textContent = active.length + ' item' + (active.length!==1?'s':'');
-
-    if(wishlist.length === 0){
-      listEl.innerHTML = '<div class="wish-empty">No items yet — add something you want to save up for!</div>';
+    var active  = wishlist.filter(function(w){ return !w.bought; });
+    countEl.textContent = active.length+' item'+(active.length!==1?'s':'');
+    if(!wishlist.length){
+      listEl.innerHTML='<div class="wish-empty">No items yet — add something you want to save up for!</div>';
       return;
     }
-
-    listEl.innerHTML = wishlist.map(function(item, idx){
-      var price = item.price;
-      var canBuyNow = currentUnallocPerPeriod >= price;
-      var canBuyBank = !canBuyNow && (currentLeftoverBank >= price);
-      var periodsNeeded = 0;
-      var planText = '';
-      var statusClass = 'grey';
-      var itemClass = 'cant-buy';
-      var planClass = 'red';
-
+    listEl.innerHTML=wishlist.map(function(item,idx){
+      var price=item.price;
+      var canNow  = currentUnallocPerPeriod>=price;
+      var canBank = !canNow && currentLeftoverBank>=price;
+      var statusClass='red', itemClass='cant-buy', planClass='red', planText='';
       if(item.bought){
-        planText = 'Purchased ✓';
-        statusClass = 'grey';
-        itemClass = '';
-        planClass = 'grey';
-      } else if(canBuyNow){
-        planText = 'You can buy this now from current unallocated funds!';
-        statusClass = 'green'; itemClass = 'can-buy'; planClass = 'green';
-      } else if(canBuyBank){
-        planText = 'You can buy this from your leftover bank (' + fmt(currentLeftoverBank) + ' available)';
-        statusClass = 'yellow'; itemClass = 'can-buy-bank'; planClass = 'yellow';
+        planText='Purchased ✓'; statusClass='grey'; itemClass=''; planClass='grey';
+      } else if(canNow){
+        planText='You can buy this now from current unallocated funds!';
+        statusClass='green'; itemClass='can-buy'; planClass='green';
+      } else if(canBank){
+        planText='You can buy this from your leftover bank ('+fmt(currentLeftoverBank)+' available)';
+        statusClass='yellow'; itemClass='can-buy-bank'; planClass='yellow';
       } else {
-        var shortfall = price - currentLeftoverBank;
-        if(currentUnallocPerPeriod > 0){
-          periodsNeeded = Math.ceil(shortfall / currentUnallocPerPeriod);
-          var cfg = PERIODS[currentPeriod];
-          planText = 'Save for ' + periodsNeeded + ' ' + cfg.perName + (periodsNeeded!==1?'s':'') + ' at your current rate to afford this';
+        var shortfall=price-Math.max(0,currentLeftoverBank);
+        if(currentUnallocPerPeriod>0){
+          var periods=Math.ceil(shortfall/currentUnallocPerPeriod);
+          var cfg=PERIODS[currentPeriod];
+          planText='Save for '+periods+' '+cfg.perName+(periods!==1?'s':'')+' at your current rate';
         } else {
-          planText = 'Enter your income and expenses to see a savings plan';
+          planText='Enter your income and expenses to see a savings plan';
         }
-        statusClass = 'red'; itemClass = 'cant-buy'; planClass = 'red';
       }
-
       return '<div class="wish-item '+itemClass+(item.bought?' bought':'')+'">'+
         '<div class="wish-status '+statusClass+'"></div>'+
         '<div class="wish-info">'+
@@ -1256,71 +982,185 @@
         '</div>'+
         '<div class="wish-price">'+fmt(price)+'</div>'+
         '<div class="wish-actions">'+
-          (!item.bought ? '<button class="wish-btn buy" data-idx="'+idx+'">✓ Buy</button>' : '')+
-          '<button class="wish-btn del" data-idx="'+idx+'" data-action="del">✕</button>'+
+          (!item.bought?'<button class="wish-btn buy" data-idx="'+idx+'">✓ Buy</button>':'')+
+          '<button class="wish-btn del" data-idx="'+idx+'">✕</button>'+
         '</div>'+
       '</div>';
     }).join('');
 
-    // wire buy and delete buttons
     listEl.querySelectorAll('.wish-btn.buy').forEach(function(btn){
       btn.addEventListener('click', function(){
-        var idx = parseInt(this.dataset.idx);
-        var item = wishlist[idx];
-        var confirmBuy = confirm('Mark "'+item.name+'" as purchased for '+fmt(item.price)+'?\n\nDeduct from leftover bank? (Cancel = no deduction)');
-        if(confirmBuy === null) return;
-        wishlist[idx].bought = true;
-        // offer to deduct from bank
-        if(confirmBuy && currentLeftoverBank >= item.price){
-          bankTotal -= item.price;
-          saveBank(bankTotal);
-          renderBank();
-          toast(fmt(item.price)+' deducted from leftover bank');
+        var idx=parseInt(this.dataset.idx), item=wishlist[idx];
+        var deduct=confirm('Mark "'+item.name+'" as purchased ('+fmt(item.price)+')?\n\nOK = deduct from leftover bank\nCancel = just mark as bought');
+        wishlist[idx].bought=true;
+        if(deduct&&currentLeftoverBank>=item.price){
+          bankTotal-=item.price; saveBank(bankTotal);
+          currentLeftoverBank=bankTotal; renderBank();
+          toast(fmt(item.price)+' deducted from bank');
         }
-        saveWishlist();
-        renderWishlist();
+        saveWishlist(); renderWishlist();
       });
     });
-
     listEl.querySelectorAll('.wish-btn.del').forEach(function(btn){
       btn.addEventListener('click', function(){
-        var idx = parseInt(this.dataset.idx);
-        wishlist.splice(idx, 1);
-        saveWishlist();
-        renderWishlist();
-        toast('Item removed');
+        wishlist.splice(parseInt(this.dataset.idx),1);
+        saveWishlist(); renderWishlist(); toast('Item removed');
       });
     });
-  }
-
-  function escapeHtml(str){
-    var d = document.createElement('div'); d.textContent = str; return d.innerHTML;
   }
 
   document.getElementById('wishAddBtn').addEventListener('click', function(){
-    var name = document.getElementById('wishName').value.trim();
-    var price = parseFloat(document.getElementById('wishPrice').value);
+    var name=document.getElementById('wishName').value.trim();
+    var price=parseFloat(document.getElementById('wishPrice').value);
     if(!name){ toast('Enter an item name'); return; }
-    if(!price || price <= 0){ toast('Enter a valid price'); return; }
-    wishlist.push({ name: name, price: price, bought: false, added: new Date().toISOString().split('T')[0] });
+    if(!price||price<=0){ toast('Enter a valid price'); return; }
+    wishlist.push({name:name, price:price, bought:false, added:new Date().toISOString().split('T')[0]});
     saveWishlist();
-    document.getElementById('wishName').value = '';
-    document.getElementById('wishPrice').value = '';
-    renderWishlist();
-    toast(name + ' added to wishlist!');
+    document.getElementById('wishName').value='';
+    document.getElementById('wishPrice').value='';
+    renderWishlist(); toast(name+' added to wishlist!');
+  });
+  document.getElementById('wishName').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('wishAddBtn').click(); });
+  document.getElementById('wishPrice').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('wishAddBtn').click(); });
+
+  // -- IMPORT STATEMENT -------------------------------------
+  var BUDGET_CATEGORIES=['Rent','Utilities','Subscriptions','Transport','Groceries','Nutrition','Dining','Travel','Betting','Fitness','Entertainment','Shopping','Business','Savings','Investing','Retirement','Other (not counted)'];
+  var EXACT_CAT_MAP={
+    'shopping':'Shopping','utilities':'Utilities','groceries':'Groceries','rent':'Rent',
+    'dining':'Dining','nutrition':'Nutrition','business':'Business','travel':'Travel',
+    'fitness':'Fitness','entertainment':'Entertainment','subscriptions':'Subscriptions',
+    'subscription':'Subscriptions','transport':'Transport','transportation':'Transport',
+    'betting':'Betting','savings':'Savings','investing':'Investing','retirement':'Retirement'
+  };
+  var AMEX_CAT_MAP={
+    'restaurant':'Dining','restaurants':'Dining','dining':'Dining','bar':'Dining','food':'Dining',
+    'grocery':'Groceries','groceries':'Groceries','supermarket':'Groceries',
+    'travel':'Travel','airline':'Travel','hotel':'Travel','lodging':'Travel','car rental':'Travel',
+    'gas station':'Transport','gas stations':'Transport','transportation':'Transport','parking':'Transport','rideshare':'Transport',
+    'entertainment':'Entertainment','recreation':'Entertainment','streaming':'Subscriptions','subscription':'Subscriptions',
+    'shopping':'Shopping','retail':'Shopping','clothing':'Shopping','merchandise':'Shopping',
+    'fitness':'Fitness','gym':'Fitness',
+    'rent':'Rent','mortgage':'Rent',
+    'utilities':'Utilities','phone':'Utilities','internet':'Utilities','insurance':'Utilities',
+    'gambling':'Betting','casino':'Betting',
+    'business':'Business','office supplies':'Business',
+    'health & wellness':'Nutrition','nutrition':'Nutrition','supplements':'Nutrition'
+  };
+  var KEYWORD_MAP=[
+    [/draftkings|fanduel|betmgm|caesars|sportsbook|casino/i,'Betting'],
+    [/whole foods|trader joe|safeway|kroger|wegmans|albertsons|grocery|aldi|sprouts|costco|ralphs|publix/i,'Groceries'],
+    [/gnc|vitamin shoppe|supplement|protein|nutrition/i,'Nutrition'],
+    [/uber eats|doordash|grubhub|restaurant|cafe|coffee|starbucks|chipotle|mcdonald|wendy|pizza|sushi|grill|diner|taco/i,'Dining'],
+    [/delta|united|american air|southwest|jetblue|airbnb|marriott|hilton|hyatt|expedia|hotel|airlines/i,'Travel'],
+    [/uber|lyft|shell|chevron|exxon|bp |valero|parking|transit|tolls/i,'Transport'],
+    [/netflix|spotify|hulu|disney|hbo|apple\.com\/bill|prime video|youtube premium/i,'Subscriptions'],
+    [/planet fitness|equinox|la fitness|crossfit|gym|yoga|peloton/i,'Fitness'],
+    [/amazon|target|walmart|best buy|nike|nordstrom|macy|tj maxx|marshalls|zara/i,'Shopping'],
+    [/amc|regal|cinema|movie|ticketmaster|stubhub|live nation|concert/i,'Entertainment'],
+    [/electric|water|comcast|verizon|at&t|t-mobile|geico|state farm|allstate|insurance/i,'Utilities'],
+    [/rent|property management|apartments/i,'Rent']
+  ];
+
+  function categorize(desc, rawCat){
+    var d=desc.toLowerCase(), rc=rawCat.trim().toLowerCase();
+    if(EXACT_CAT_MAP[rc]) return EXACT_CAT_MAP[rc];
+    for(var k in AMEX_CAT_MAP){ if(rc.indexOf(k)!==-1) return AMEX_CAT_MAP[k]; }
+    for(var i=0;i<KEYWORD_MAP.length;i++){ if(KEYWORD_MAP[i][0].test(d)) return KEYWORD_MAP[i][1]; }
+    return 'Other (not counted)';
+  }
+
+  function parseCSV(text){
+    var lines=text.trim().split('\n');
+    if(lines.length<2) return [];
+    var first=lines[0];
+    var delim=first.indexOf('\t')!==-1?'\t':(first.split(',').length<3&&first.split(';').length>=3?';':',');
+    function parseLine(line){
+      var fields=[],cur='',inQ=false;
+      for(var i=0;i<line.length;i++){
+        var ch=line[i];
+        if(ch==='"'){ inQ=!inQ; }
+        else if(ch===delim&&!inQ){ fields.push(cur);cur=''; }
+        else{ cur+=ch; }
+      }
+      fields.push(cur);
+      return fields.map(function(f){ return f.trim().replace(/^"|"$/g,'').trim(); });
+    }
+    var headers=parseLine(lines[0]).map(function(h){ return h.trim(); });
+    var dateIdx=headers.indexOf('Date'), descIdx=headers.indexOf('Description');
+    var amtIdx=headers.indexOf('Amount'), catIdx=headers.indexOf('Category');
+    if(descIdx===-1||amtIdx===-1) return null;
+    var txns=[];
+    for(var i=1;i<lines.length;i++){
+      if(!lines[i].trim()) continue;
+      var f=parseLine(lines[i]);
+      var amt=parseFloat((f[amtIdx]||'').replace(/[^0-9.\-]/g,''));
+      if(isNaN(amt)||amt<=0) continue;
+      txns.push({ date:dateIdx!==-1?f[dateIdx]:'', description:f[descIdx]||'', amount:amt, amexCategory:catIdx!==-1?f[catIdx]:'' });
+    }
+    return txns;
+  }
+
+  var parsedTxns=[];
+
+  document.getElementById('importStatementBtn').addEventListener('click', function(){
+    document.getElementById('importModal').classList.add('open');
+    document.getElementById('reviewSection').style.display='none';
+    document.getElementById('reviewSection').innerHTML='';
+    document.getElementById('csvInput').value='';
+  });
+  document.getElementById('closeImportBtn').addEventListener('click', function(){ document.getElementById('importModal').classList.remove('open'); });
+
+  document.getElementById('parseCsvBtn').addEventListener('click', function(){
+    var raw=document.getElementById('csvInput').value;
+    var txns=parseCSV(raw);
+    var rev=document.getElementById('reviewSection');
+    if(!txns){ rev.style.display='block'; rev.innerHTML='<div class="privacy-note" style="color:var(--red);margin-top:14px">Could not find Description and Amount columns. Include the header row.</div>'; return; }
+    if(!txns.length){ rev.style.display='block'; rev.innerHTML='<div class="privacy-note" style="color:var(--yellow);margin-top:14px">No charges found.</div>'; return; }
+    parsedTxns=txns.map(function(t){ return {date:t.date,description:t.description,amount:t.amount,category:categorize(t.description,t.amexCategory)}; });
+    renderReview();
   });
 
-  // allow Enter key in wishName to add
-  document.getElementById('wishName').addEventListener('keydown', function(e){
-    if(e.key === 'Enter') document.getElementById('wishAddBtn').click();
-  });
-  document.getElementById('wishPrice').addEventListener('keydown', function(e){
-    if(e.key === 'Enter') document.getElementById('wishAddBtn').click();
-  });
+  function renderReview(){
+    var rev=document.getElementById('reviewSection');
+    rev.style.display='block';
+    var rows=parsedTxns.map(function(t,i){
+      var opts=BUDGET_CATEGORIES.map(function(c){ return '<option value="'+c+'"'+(c===t.category?' selected':'')+'>'+c+'</option>'; }).join('');
+      return '<tr><td>'+(t.date||'')+'</td><td>'+escapeHtml(t.description)+'</td><td class="amt">$'+t.amount.toFixed(2)+'</td><td><select data-idx="'+i+'" class="cat-select">'+opts+'</select></td></tr>';
+    }).join('');
+    rev.innerHTML='<table class="review-table"><thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Category</th></tr></thead><tbody>'+rows+'</tbody></table><div class="review-summary" id="categorySummary"></div><div class="modal-actions"><button class="modal-btn secondary" id="cancelReviewBtn">Cancel</button><button class="modal-btn primary" id="applyCategoriesBtn">Apply to Budget</button></div>';
+    rev.querySelectorAll('.cat-select').forEach(function(sel){
+      sel.addEventListener('change', function(){ parsedTxns[parseInt(this.dataset.idx)].category=this.value; renderCategorySummary(); });
+    });
+    document.getElementById('cancelReviewBtn').addEventListener('click', function(){ document.getElementById('importModal').classList.remove('open'); });
+    document.getElementById('applyCategoriesBtn').addEventListener('click', applyCategories);
+    renderCategorySummary();
+  }
 
+  function renderCategorySummary(){
+    var totals={};
+    parsedTxns.forEach(function(t){ if(t.category!=='Other (not counted)') totals[t.category]=(totals[t.category]||0)+t.amount; });
+    var other=parsedTxns.filter(function(t){ return t.category==='Other (not counted)'; }).length;
+    var rows=Object.keys(totals).sort().map(function(c){ return '<div class="review-summary-row"><span class="cat">'+c+'</span><span class="val">$'+totals[c].toFixed(2)+'</span></div>'; }).join('');
+    document.getElementById('categorySummary').innerHTML='<div style="font-weight:600;margin-bottom:6px;color:var(--text)">Category Totals (will replace current values)</div>'+rows+(other?'<div style="margin-top:6px;color:var(--muted);font-size:12px">'+other+' transaction(s) marked Other — not applied.</div>':'');
+  }
+
+  function applyCategories(){
+    var totals={};
+    parsedTxns.forEach(function(t){ if(t.category!=='Other (not counted)') totals[t.category]=(totals[t.category]||0)+t.amount; });
+    document.querySelectorAll('.cat-input').forEach(function(input){
+      var cat=input.dataset.cat;
+      if(totals.hasOwnProperty(cat)) input.value=Math.round(totals[cat]*100)/100;
+    });
+    document.getElementById('importModal').classList.remove('open');
+    document.getElementById('reviewSection').innerHTML='';
+    runUpdate();
+    toast('Statement applied to budget!');
+  }
+
+  // -- INIT -------------------------------------------------
+  wireInputs();
+  renderBank();
   renderWishlist();
-
-
   runUpdate();
 
 })();
