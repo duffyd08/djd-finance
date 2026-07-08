@@ -1242,6 +1242,12 @@ function toggleAcc(header){
   };
   var activeFilter = 'All';
 
+  function setTxnFilter(cat){
+    activeFilter = cat;
+    renderTransactions();
+  }
+  window.setTxnFilter = setTxnFilter;
+
   function renderTransactions(){
     var content = document.getElementById('txnContent');
     var badge   = document.getElementById('txnBadge');
@@ -1285,12 +1291,6 @@ function toggleAcc(header){
       '<div class="txn-list">'+items+'</div>';
   }
 
-  function setTxnFilter(cat){
-    activeFilter = cat;
-    renderTransactions();
-  }
-
-  // ── TRENDS VIEW ──────────────────────────────────────────
   function renderTrends(){
     var content = document.getElementById('trendsContent');
     if(!payHistory || payHistory.length < 2){
