@@ -1,386 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="DJD Finance"/>
+<meta name="theme-color" content="#ffffff"/>
 <title>DJD Finance</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg: #0e0f13; --surface: #16181f; --surface2: #1e2029; --border: #2a2d3a;
-    --text: #f0f0f4; --muted: #7a7f96; --accent: #6c63ff; --accent2: #a78bfa;
-    --green: #22c55e; --yellow: #facc15; --red: #f87171; --blue: #38bdf8;
-    --orange: #fb923c; --radius: 14px; --radius-sm: 8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; font-size: 14px; }
+:root {
+  --bg: #f5f6fa;
+  --surface: #ffffff;
+  --surface2: #f0f1f6;
+  --border: #e2e4ed;
+  --text: #0f1117;
+  --muted: #8b90a7;
+  --accent: #5b4fff;
+  --accent2: #7c6fff;
+  --green: #10b981;
+  --green-bg: #ecfdf5;
+  --green-border: #a7f3d0;
+  --red: #ef4444;
+  --red-bg: #fef2f2;
+  --red-border: #fecaca;
+  --yellow: #f59e0b;
+  --yellow-bg: #fffbeb;
+  --blue: #3b82f6;
+  --blue-bg: #eff6ff;
+  --orange: #f97316;
+  --purple-bg: #f5f3ff;
+  --purple-border: #ddd6fe;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;min-height:100vh;}
 
-  header { padding: 24px 40px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 16px; }
-  .logo { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
-  .logo span { color: var(--accent2); }
-  .month-label { margin-left: auto; font-size: 13px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; }
+/* HEADER */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;height:60px;gap:16px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.5px;color:var(--text);}
+.logo span{color:var(--accent);}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.month-chip{font-size:12px;font-weight:600;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:5px 12px;border-radius:20px;}
+.import-btn{background:var(--accent);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity 0.15s;}
+.import-btn:hover{opacity:0.88;}
 
-  .app { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 73px); }
-  .left-panel { border-right: 1px solid var(--border); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
-  .right-panel { padding: 24px 32px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+/* LAYOUT */
+.app{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 60px);}
+.left-panel{background:var(--surface);border-right:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:20px;}
+.right-panel{padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
 
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+/* PERIOD TOGGLE */
+.period-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.period-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.period-toggle{display:flex;background:var(--border);border-radius:var(--radius-sm);padding:3px;gap:3px;}
+.period-btn{flex:1;background:transparent;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:7px;border-radius:8px;cursor:pointer;transition:all 0.15s;}
+.period-btn.active{background:var(--surface);color:var(--accent);box-shadow:var(--shadow);}
+.period-info{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;}
+.period-info b{color:var(--accent);}
 
-  /* PERIOD TOGGLE */
-  .period-toggle { display: flex; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 4px; gap: 4px; margin-bottom: 12px; }
-  .period-btn { flex: 1; background: transparent; border: none; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 8px 6px; border-radius: 7px; cursor: pointer; transition: all 0.15s; }
-  .period-btn.active { background: var(--accent); color: white; }
-  .period-info { font-size: 11px; color: var(--muted); background: var(--surface2); border-radius: var(--radius-sm); padding: 6px 10px; margin-bottom: 12px; text-align: center; }
-  .period-info b { color: var(--accent2); }
+/* INCOME CARD */
+.income-card{background:linear-gradient(135deg,var(--accent) 0%,#7c6fff 100%);border-radius:var(--radius);padding:20px;color:#fff;}
+.income-label{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;opacity:0.8;margin-bottom:6px;}
+.income-amount{font-family:'Space Grotesk',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.income-sub{font-size:11px;opacity:0.75;margin-top:6px;margin-bottom:14px;}
+.income-input-wrap{display:flex;align-items:center;background:rgba(255,255,255,0.2);border-radius:var(--radius-sm);overflow:hidden;border:1px solid rgba(255,255,255,0.3);}
+.income-prefix{padding:0 10px;font-size:16px;opacity:0.9;}
+.income-input{background:transparent;border:none;outline:none;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;padding:10px 4px;width:100%;}
+.income-input::placeholder{color:rgba(255,255,255,0.5);}
 
-  /* INCOME CARD */
-  .income-card { background: linear-gradient(135deg, #1a1730, #1e1f2e); border: 1px solid #3a3566; border-radius: var(--radius); padding: 18px; }
-  .income-amount { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 700; color: var(--accent2); line-height: 1; margin: 6px 0 4px; }
-  .income-sub { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
-  .input-row { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; transition: border-color 0.15s; }
-  .input-row:focus-within { border-color: var(--accent); }
-  .input-prefix { padding: 0 10px; color: var(--muted); background: var(--surface); align-self: stretch; display: flex; align-items: center; border-right: 1px solid var(--border); }
-  .input-row input { background: transparent; border: none; outline: none; color: var(--text); font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 500; padding: 10px 12px; width: 100%; }
-  .input-row input::placeholder { color: var(--border); }
+/* SECTION HEADERS */
+.sec-hdr{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;margin-top:4px;}
 
-  /* EXPENSE ROWS */
-  .expense-list { display: flex; flex-direction: column; gap: 8px; }
-  .cat-row { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; transition: border-color 0.15s; }
-  .cat-row:focus-within { border-color: var(--accent); }
-  .cat-icon { font-size: 16px; width: 26px; text-align: center; flex-shrink: 0; }
-  .cat-name { flex: 1; font-size: 13px; font-weight: 500; }
-  .cat-dollar { color: var(--muted); font-size: 13px; margin-right: 2px; }
-  .cat-input { background: transparent; border: none; outline: none; color: var(--accent2); font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; width: 80px; text-align: right; }
-  .cat-input::placeholder { color: var(--border); }
-  .add-btn { display: flex; align-items: center; gap: 8px; background: transparent; border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 10px 12px; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; width: 100%; font-family: 'Inter', sans-serif; margin-top: 4px; }
-  .add-btn:hover { border-color: var(--accent); color: var(--accent2); }
+/* EXPENSE INPUTS */
+.exp-list{display:flex;flex-direction:column;gap:6px;}
+.exp-row{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;transition:border-color 0.15s;}
+.exp-row:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,79,255,0.08);}
+.exp-icon{font-size:15px;width:22px;text-align:center;flex-shrink:0;}
+.exp-name{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.exp-dollar{font-size:13px;color:var(--muted);margin-right:2px;}
+.cat-input{background:transparent;border:none;outline:none;color:var(--accent);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;width:76px;text-align:right;}
+.cat-input::placeholder{color:var(--border);}
+.add-cat-btn{display:flex;align-items:center;gap:6px;background:transparent;border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:9px 12px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;width:100%;font-family:'Inter',sans-serif;margin-top:4px;}
+.add-cat-btn:hover{border-color:var(--accent);color:var(--accent);}
 
-  /* STAT CARDS */
-  /* UNALLOCATED BANNER */
-  .unalloc-banner {
-    background: linear-gradient(135deg, #1a1730, #1e1f2e);
-    border: 1px solid #3a3566;
-    border-radius: var(--radius);
-    padding: 22px 26px;
-    text-align: center;
-    transition: border-color 0.3s, background 0.3s;
-  }
-  .unalloc-banner.over {
-    background: linear-gradient(135deg, #2a1414, #2e1717);
-    border-color: #6b2a2a;
-  }
-  .unalloc-banner.healthy {
-    background: linear-gradient(135deg, #0f2418, #122a1c);
-    border-color: #1f5c3a;
-  }
-  .unalloc-label {
-    font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 6px;
-  }
-  .unalloc-val {
-    font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 800;
-    line-height: 1; color: var(--accent2); transition: color 0.3s;
-  }
-  .unalloc-banner.over .unalloc-val { color: var(--red); }
-  .unalloc-banner.healthy .unalloc-val { color: var(--green); }
-  .unalloc-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+/* UNALLOCATED BANNER */
+.unalloc-banner{border-radius:var(--radius);padding:20px 24px;text-align:center;border:1.5px solid var(--border);background:var(--surface);transition:all 0.3s;box-shadow:var(--shadow);}
+.unalloc-banner.healthy{background:var(--green-bg);border-color:var(--green-border);}
+.unalloc-banner.over{background:var(--red-bg);border-color:var(--red-border);}
+.unalloc-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.unalloc-val{font-family:'Space Grotesk',sans-serif;font-size:44px;font-weight:800;letter-spacing:-2px;color:var(--text);line-height:1;transition:color 0.3s;}
+.unalloc-banner.healthy .unalloc-val{color:var(--green);}
+.unalloc-banner.over .unalloc-val{color:var(--red);}
+.unalloc-sub{font-size:12px;color:var(--muted);margin-top:6px;}
+.save-period-btn{margin-top:12px;background:var(--accent);color:#fff;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:9px 20px;border-radius:var(--radius-sm);cursor:pointer;transition:opacity 0.15s;}
+.save-period-btn:hover{opacity:0.88;}
 
-  .save-period-btn {
-    margin-top: 14px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 10px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: opacity 0.15s;
-  }
-  .save-period-btn:hover { opacity: 0.85; }
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+.stat-lbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;}
+.stat-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;margin-top:4px;letter-spacing:-0.5px;}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.c-green{color:var(--green);} .c-red{color:var(--red);} .c-blue{color:var(--blue);} .c-purple{color:var(--accent);}
 
-  /* LEFTOVER BANK */
-  .bank-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 22px;
-  }
-  .bank-row { display: flex; align-items: center; justify-content: space-between; }
-  .bank-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
-  .bank-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .bank-val { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 800; color: var(--green); }
-  .bank-val.negative { color: var(--red); }
-  .bank-actions { display: flex; gap: 10px; margin-top: 12px; }
-  .bank-btn {
-    flex: 1; padding: 10px; border-radius: var(--radius-sm); border: none;
-    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer;
-    background: var(--surface2); color: var(--text); border: 1px solid var(--border); transition: border-color 0.15s;
-  }
-  .bank-btn:hover { border-color: var(--accent); }
-  .bank-btn.secondary { color: var(--muted); }
+/* ACCORDION */
+.accordion{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.accordion+.accordion{margin-top:12px;}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.acc-header:hover{background:var(--surface2);}
+.acc-title{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text);}
+.acc-icon{font-size:18px;}
+.acc-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--purple-bg);color:var(--accent);border:1px solid var(--purple-border);}
+.acc-chevron{font-size:12px;color:var(--muted);transition:transform 0.2s;}
+.acc-chevron.open{transform:rotate(180deg);}
+.acc-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border);}
+.acc-body.open{display:block;}
 
-  /* HISTORY LIST */
-  .history-item {
-    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 14px; margin-bottom: 10px;
-  }
-  .history-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-  .history-date { font-size: 14px; font-weight: 700; }
-  .history-leftover { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
-  .history-leftover.negative { color: var(--red); }
-  .history-leftover.positive { color: var(--green); }
-  .history-details { font-size: 12px; color: var(--muted); line-height: 1.6; }
-  .history-delete {
-    background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 12px;
-    margin-top: 8px; text-decoration: underline;
-  }
-  .history-delete:hover { color: var(--red); }
+/* CHARTS */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.chart-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;}
+.chart-box h4{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:14px;}
 
-  /* HYSA TRACKER */
-  .hysa-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
-  .hysa-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
-  .hysa-header h3 { font-size: 14px; font-weight: 600; }
-  .hysa-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .hysa-apy-wrap { display: flex; align-items: center; gap: 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 10px; }
-  .hysa-apy-wrap input { background: transparent; border: none; outline: none; color: var(--accent2); font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; width: 44px; text-align: right; }
-  .hysa-apy-label { font-size: 12px; color: var(--muted); font-weight: 600; white-space: nowrap; }
-  .hysa-inputs { margin-bottom: 14px; }
-  .hysa-input-group label { font-size: 12px; color: var(--muted); font-weight: 600; display: block; margin-bottom: 6px; }
-  .hysa-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
-  .hysa-stat { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
-  .hysa-stat-val { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; color: var(--green); }
-  .hysa-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 3px; }
-  .hysa-projection { margin-top: 4px; }
-  .hysa-proj-title { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.8px; }
-  .hysa-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 6px; }
-  .hysa-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; height: 100%; justify-content: flex-end; }
-  .hysa-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; }
-  .hysa-bar-lbl { font-size: 9px; color: var(--muted); }
-  .hysa-bar-val { font-size: 9px; color: var(--text); font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
-  .hysa-proj-note { font-size: 12px; color: var(--muted); line-height: 1.5; margin-top: 8px; }
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:16px;}
+.donut-legend{flex:1;display:flex;flex-direction:column;gap:7px;overflow:hidden;}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.legend-name{flex:1;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.legend-val{color:var(--text);font-weight:700;font-family:'Space Grotesk',sans-serif;font-size:12px;}
 
-  /* WISHLIST */
-  .wish-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
-  .wish-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .wish-header h3 { font-size: 14px; font-weight: 600; }
-  .wish-count { font-size: 12px; color: var(--muted); font-weight: 600; }
-  .wish-add-row { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; }
-  .wish-add-btn {
-    background: var(--accent); color: white; border: none; border-radius: var(--radius-sm);
-    padding: 10px 16px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
-    cursor: pointer; white-space: nowrap; flex-shrink: 0;
-  }
-  .wish-add-btn:hover { opacity: 0.85; }
-  .wish-item {
-    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
-    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    margin-bottom: 8px; transition: border-color 0.15s;
-  }
-  .wish-item.can-buy { border-color: rgba(52,211,153,0.4); }
-  .wish-item.can-buy-bank { border-color: rgba(251,191,36,0.4); }
-  .wish-item.cant-buy { border-color: var(--border); }
-  .wish-item.bought { opacity: 0.5; }
-  .wish-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .wish-status.green { background: var(--green); }
-  .wish-status.yellow { background: var(--yellow); }
-  .wish-status.red { background: var(--red); }
-  .wish-status.grey { background: var(--muted); }
-  .wish-info { flex: 1; }
-  .wish-name { font-size: 14px; font-weight: 600; }
-  .wish-name.done { text-decoration: line-through; color: var(--muted); }
-  .wish-plan { font-size: 11px; margin-top: 3px; }
-  .wish-plan.green { color: var(--green); }
-  .wish-plan.yellow { color: var(--yellow); }
-  .wish-plan.red { color: var(--muted); }
-  .wish-price { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--accent2); flex-shrink: 0; }
-  .wish-actions { display: flex; gap: 6px; flex-shrink: 0; }
-  .wish-btn {
-    background: transparent; border: 1px solid var(--border); border-radius: 6px;
-    padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer;
-    font-family: 'Inter', sans-serif; color: var(--muted); transition: all 0.15s;
-  }
-  .wish-btn.buy { color: var(--green); border-color: rgba(52,211,153,0.4); }
-  .wish-btn.buy:hover { background: rgba(52,211,153,0.1); }
-  .wish-btn.del { color: var(--red); border-color: rgba(248,113,113,0.3); }
-  .wish-btn.del:hover { background: rgba(248,113,113,0.1); }
-  .wish-empty { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+/* HEALTH BAR */
+.health-section{margin-top:16px;}
+.health-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.health-title{font-size:13px;font-weight:700;}
+.badge{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-yellow{background:var(--yellow-bg);color:var(--yellow);border:1px solid #fde68a;}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-lbl{font-size:12px;color:var(--muted);font-weight:500;width:64px;flex-shrink:0;}
+.bar-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1);}
+.bar-pct{font-size:11px;color:var(--muted);font-weight:600;width:32px;text-align:right;flex-shrink:0;}
 
+/* 50/30/20 */
+.rule-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;}
+.rule-box{border-radius:var(--radius-sm);padding:14px;text-align:center;border:1px solid var(--border);}
+.rule-pct{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+.rule-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.rule-target{font-size:10px;font-weight:600;margin-top:6px;padding:3px 8px;border-radius:10px;display:inline-block;}
 
-  .toast {
-    position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-16px);
-    background: var(--green); color: #06140c; font-size: 13px; font-weight: 700;
-    padding: 10px 20px; border-radius: 20px; z-index: 2000; opacity: 0;
-    transition: all 0.3s; pointer-events: none; white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+/* WEEKLY */
+.week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;}
+.week-col{text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 8px;}
+.week-lbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+.week-bar-wrap{height:52px;display:flex;align-items:flex-end;justify-content:center;margin-bottom:6px;}
+.week-bar{width:28px;border-radius:4px 4px 0 0;background:linear-gradient(to top,var(--accent),#a78bfa);}
+.week-amt{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;color:var(--text);}
 
-  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
-  .stat-label { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; }
-  .stat-val { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; margin-top: 6px; line-height: 1; }
-  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .c-green { color: var(--green); } .c-red { color: var(--red); } .c-blue { color: var(--blue); } .c-purple { color: var(--accent2); }
+/* GOAL */
+.goal-inputs{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;}
+.goal-inputs label{font-size:12px;color:var(--muted);font-weight:600;white-space:nowrap;}
+.input-row-light{display:flex;align-items:center;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:border-color 0.15s;}
+.input-row-light:focus-within{border-color:var(--accent);}
+.input-prefix-light{padding:0 10px;color:var(--muted);background:var(--surface);align-self:stretch;display:flex;align-items:center;border-right:1px solid var(--border);font-size:13px;}
+.input-row-light input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;padding:9px 10px;width:120px;}
+.goal-track{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin:12px 0 6px;border:1px solid var(--border);}
+.goal-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),#a78bfa);transition:width 0.5s cubic-bezier(0.4,0,0.2,1);}
+.goal-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+.goal-months{font-size:13px;color:var(--muted);margin-top:8px;}
+.goal-months b{color:var(--accent);}
 
-  /* HEALTH */
-  .health-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; }
-  .health-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  .health-top h3 { font-size: 14px; font-weight: 600; }
-  .badge { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
-  .badge-green { background: #15382a; color: var(--green); }
-  .badge-yellow { background: #332d00; color: var(--yellow); }
-  .badge-red { background: #3a1515; color: var(--red); }
-  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .bar-lbl { font-size: 12px; color: var(--muted); width: 70px; flex-shrink: 0; }
-  .bar-track { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
-  .bar-pct { font-size: 12px; color: var(--muted); width: 34px; text-align: right; flex-shrink: 0; }
+/* TIPS */
+.tip-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.tip{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);}
+.tip.warn{background:var(--red-bg);border-color:var(--red-border);}
+.tip.ok{background:var(--green-bg);border-color:var(--green-border);}
+.tip.info{background:var(--yellow-bg);border-color:#fde68a;}
+.tip.blue{background:var(--blue-bg);border-color:#bfdbfe;}
+.tip-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.tip-text{font-size:13px;line-height:1.5;color:var(--text);}
+.tip-text b{font-weight:700;}
 
-  /* CHARTS */
-  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
-  .chart-card h3 { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
-  .donut-wrap { display: flex; align-items: center; gap: 16px; }
-  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 7px; }
-  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .legend-name { flex: 1; color: var(--muted); }
-  .legend-val { color: var(--text); font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
-  .rule-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-  .rule-box { border-radius: var(--radius-sm); padding: 10px; text-align: center; }
-  .rule-pct { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; }
-  .rule-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .rule-target { font-size: 10px; font-weight: 600; margin-top: 4px; }
+/* TRANSACTIONS TAB */
+.txn-empty{text-align:center;padding:32px;color:var(--muted);font-size:13px;line-height:1.6;}
+.txn-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.txn-sum-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.txn-sum-val{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:var(--text);}
+.txn-sum-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.txn-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.txn-chip{background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.15s;border:none;font-family:'Inter',sans-serif;}
+.txn-chip.active{background:var(--accent);color:#fff;}
+.txn-list{display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto;}
+.txn-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);}
+.txn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.txn-info{flex:1;}
+.txn-name{font-size:13px;font-weight:600;color:var(--text);}
+.txn-cat{font-size:11px;color:var(--muted);margin-top:1px;}
+.txn-date{font-size:11px;color:var(--muted);}
+.txn-amt{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--text);flex-shrink:0;}
 
-  /* GOAL */
-  .goal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
-  .goal-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
-  .goal-inputs { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-  .goal-inputs label { font-size: 12px; color: var(--muted); white-space: nowrap; }
-  .goal-track { background: var(--surface2); height: 12px; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
-  .goal-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s; }
-  .goal-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
-  .goal-months { font-size: 13px; color: var(--muted); margin-top: 8px; }
-  .goal-months b { color: var(--accent2); font-family: 'Space Grotesk', sans-serif; }
+/* TRENDS */
+.trends-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.trend-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;}
+.trend-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+.trend-bars{display:flex;align-items:flex-end;gap:4px;height:70px;}
+.trend-bar{flex:1;border-radius:3px 3px 0 0;min-height:4px;transition:height 0.4s;}
+.trend-lbl{font-size:9px;color:var(--muted);text-align:center;margin-top:4px;}
+.trend-empty{font-size:12px;color:var(--muted);text-align:center;padding:20px 0;}
 
-  /* WEEKLY */
-  .week-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; }
-  .week-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
-  .week-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
-  .week-col { text-align: center; }
-  .week-col .wlbl { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
-  .week-col .wbar-wrap { height: 60px; display: flex; align-items: flex-end; justify-content: center; margin: 6px 0; }
-  .week-col .wbar { width: 32px; background: var(--accent); border-radius: 4px 4px 0 0; opacity: 0.8; }
-  .week-col .wamt { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; }
+/* BANK CARD */
+.bank-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;box-shadow:var(--shadow);}
+.bank-row{display:flex;align-items:center;justify-content:space-between;}
+.bank-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;}
+.bank-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.bank-val{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:800;color:var(--green);}
+.bank-val.negative{color:var(--red);}
+.bank-actions{display:flex;gap:8px;margin-top:12px;}
+.bank-btn{flex:1;padding:9px;border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;background:var(--surface2);color:var(--text);border:1px solid var(--border);transition:border-color 0.15s;}
+.bank-btn:hover{border-color:var(--accent);}
 
-  /* AI TIPS */
-  .tips-card { background: linear-gradient(135deg,#13142a,#1a1232); border: 1px solid #3a3566; border-radius: var(--radius); padding: 20px; }
-  .tips-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-  .ai-badge { background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.8px; }
-  .tips-header h3 { font-size: 15px; font-weight: 600; }
-  .tip-list { display: flex; flex-direction: column; gap: 8px; }
-  .tip { display: flex; gap: 10px; align-items: flex-start; background: rgba(255,255,255,0.04); border-radius: var(--radius-sm); padding: 12px; border-left: 3px solid transparent; }
-  .tip.warn { border-left-color: var(--red); } .tip.ok { border-left-color: var(--green); }
-  .tip.info { border-left-color: var(--yellow); } .tip.blue { border-left-color: var(--blue); }
-  .tip-icon { font-size: 16px; flex-shrink: 0; }
-  .tip-text { font-size: 13px; line-height: 1.5; color: #d0d0e0; }
-  .tip-text b { color: var(--text); }
+/* HISTORY */
+.history-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;}
+.history-item-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.history-date{font-size:13px;font-weight:700;}
+.history-leftover{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;}
+.history-leftover.positive{color:var(--green);}
+.history-leftover.negative{color:var(--red);}
+.history-details{font-size:11px;color:var(--muted);line-height:1.5;}
+.history-delete{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:11px;text-decoration:underline;margin-top:6px;}
+.history-delete:hover{color:var(--red);}
 
-  .empty { text-align: center; padding: 28px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-  .empty .emoji { font-size: 26px; margin-bottom: 8px; }
+/* WISHLIST */
+.wish-add-row{display:flex;gap:6px;align-items:center;margin-top:12px;margin-bottom:12px;}
+.wish-add-row input{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border-color 0.15s;}
+.wish-add-row input:focus{border-color:var(--accent);}
+.wish-name-input{flex:2;}
+.wish-price-input{width:90px;}
+.wish-add-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:9px 14px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.wish-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;transition:border-color 0.15s;}
+.wish-item.can-buy{border-color:var(--green-border);background:var(--green-bg);}
+.wish-item.can-buy-bank{border-color:#fde68a;background:var(--yellow-bg);}
+.wish-status{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.wish-status.green{background:var(--green);}
+.wish-status.yellow{background:var(--yellow);}
+.wish-status.red{background:var(--red);}
+.wish-status.grey{background:var(--muted);}
+.wish-info{flex:1;}
+.wish-name{font-size:13px;font-weight:600;}
+.wish-name.done{text-decoration:line-through;color:var(--muted);}
+.wish-plan{font-size:11px;margin-top:2px;color:var(--muted);}
+.wish-plan.green{color:var(--green);}
+.wish-plan.yellow{color:var(--yellow);}
+.wish-price{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;color:var(--text);flex-shrink:0;}
+.wish-actions{display:flex;gap:4px;flex-shrink:0;}
+.wish-btn{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--muted);transition:all 0.15s;}
+.wish-btn.buy{color:var(--green);border-color:var(--green-border);}
+.wish-btn.del{color:var(--red);border-color:var(--red-border);}
 
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+/* HYSA */
+.hysa-header{display:flex;align-items:flex-start;justify-content:space-between;margin-top:12px;margin-bottom:12px;}
+.hysa-header h4{font-size:13px;font-weight:700;}
+.hysa-sub-lbl{font-size:11px;color:var(--muted);}
+.hysa-apy-wrap{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;}
+.hysa-apy-wrap input{background:transparent;border:none;outline:none;color:var(--accent);font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:700;width:40px;text-align:right;}
+.hysa-apy-label{font-size:11px;color:var(--muted);font-weight:600;}
+.hysa-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.hysa-stat{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;}
+.hysa-stat-val{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:800;color:var(--green);}
+.hysa-stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;}
+.hysa-proj-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.hysa-bars{display:flex;align-items:flex-end;gap:4px;height:72px;margin-bottom:6px;}
+.hysa-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end;}
+.hysa-bar{width:100%;border-radius:3px 3px 0 0;min-height:4px;}
+.hysa-bar-lbl{font-size:9px;color:var(--muted);}
+.hysa-bar-val{font-size:9px;font-weight:700;color:var(--text);}
+.hysa-proj-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:6px;}
+.hysa-proj-note b{color:var(--green);}
 
-  @media (max-width: 900px) {
-    .app { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: repeat(2,1fr); }
-    .charts-grid { grid-template-columns: 1fr; }
-  }  /* IMPORT BUTTON */
-  .import-btn {
-    margin-left: 24px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-  }
-  .import-btn:hover { border-color: var(--accent); color: var(--accent2); }
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--radius);width:92%;max-width:700px;max-height:88vh;overflow-y:auto;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.15);}
+.modal-title{font-size:18px;font-weight:800;font-family:'Space Grotesk',sans-serif;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+.modal textarea{width:100%;min-height:150px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:monospace;font-size:12px;padding:12px;outline:none;resize:vertical;transition:border-color 0.15s;}
+.modal textarea:focus{border-color:var(--accent);}
+.modal-actions{display:flex;gap:8px;margin-top:14px;}
+.modal-btn{flex:1;padding:11px;border-radius:var(--radius-sm);border:none;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+.modal-btn:hover{opacity:0.88;}
+.modal-btn.primary{background:var(--accent);color:#fff;}
+.modal-btn.secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.review-table{width:100%;margin-top:14px;border-collapse:collapse;}
+.review-table th{text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;padding:8px 10px;border-bottom:1px solid var(--border);}
+.review-table td{padding:9px 10px;border-bottom:1px solid var(--border);font-size:13px;}
+.review-table td.amt{font-family:'Space Grotesk',sans-serif;font-weight:700;text-align:right;color:var(--text);}
+.review-table select{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:5px 8px;font-size:12px;font-family:'Inter',sans-serif;outline:none;}
+.review-summary{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-top:14px;font-size:13px;}
+.review-summary-row{display:flex;justify-content:space-between;padding:4px 0;}
+.review-summary-row .cat{color:var(--muted);}
+.review-summary-row .val{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--text);}
+.privacy-note{font-size:11px;color:var(--muted);background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;margin-top:10px;line-height:1.5;border:1px solid var(--border);}
 
-  /* MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    display: none; align-items: center; justify-content: center; z-index: 1000;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-    width: 92%; max-width: 720px; max-height: 86vh; overflow-y: auto; padding: 24px;
-  }
-  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; font-family: 'Space Grotesk', sans-serif; }
-  .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-  .modal textarea {
-    width: 100%; min-height: 160px; background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); color: var(--text); font-family: monospace; font-size: 12px;
-    padding: 12px; outline: none; resize: vertical;
-  }
-  .modal textarea:focus { border-color: var(--accent); }
-  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
-  .modal-btn {
-    flex: 1; padding: 12px; border-radius: var(--radius-sm); border: none; font-family: 'Inter', sans-serif;
-    font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.15s;
-  }
-  .modal-btn:hover { opacity: 0.85; }
-  .modal-btn.primary { background: var(--accent); color: white; }
-  .modal-btn.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--text);color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:20px;z-index:2000;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;box-shadow:var(--shadow-md);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* CATEGORY REVIEW TABLE */
-  .review-table { width: 100%; margin-top: 16px; border-collapse: collapse; }
-  .review-table th {
-    text-align: left; font-size: 11px; color: var(--muted); text-transform: uppercase;
-    letter-spacing: 0.8px; padding: 8px 10px; border-bottom: 1px solid var(--border);
-  }
-  .review-table td { padding: 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .review-table td.amt { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--accent2); text-align: right; }
-  .review-table select {
-    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
-    border-radius: 6px; padding: 6px 8px; font-size: 12px; font-family: 'Inter', sans-serif; outline: none;
-  }
-  .review-table select:focus { border-color: var(--accent); }
-  .review-summary {
-    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
-    padding: 14px; margin-top: 16px; font-size: 13px;
-  }
-  .review-summary-row { display: flex; justify-content: space-between; padding: 4px 0; }
-  .review-summary-row .cat { color: var(--muted); }
-  .review-summary-row .val { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--accent2); }
-  .privacy-note {
-    font-size: 11px; color: var(--muted); background: var(--surface2); border-radius: var(--radius-sm);
-    padding: 10px 12px; margin-top: 12px; line-height: 1.5;
-  }
+/* EMPTY */
+.empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:13px;line-height:1.6;}
+.empty .emoji{font-size:28px;margin-bottom:8px;}
 
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .charts-grid,.trends-grid{grid-template-columns:1fr;}
+  .left-panel{border-right:none;border-bottom:1px solid var(--border);}
+  .header{padding:0 16px;}
+}
 </style>
 </head>
 <body>
 
-<header>
+<div class="header">
   <div class="logo">djd<span>finance</span></div>
   <button class="import-btn" id="importStatementBtn">📄 Import Statement</button>
-  <div class="month-label" id="monthLabel"></div>
-</header>
+  <div class="header-right">
+    <div class="month-chip" id="monthLabel"></div>
+  </div>
+</div>
 
 <div class="app">
+
+  <!-- LEFT PANEL -->
   <div class="left-panel">
 
-    <!-- PAY PERIOD -->
-    <div>
-      <div class="section-label">Pay Period</div>
+    <!-- PERIOD -->
+    <div class="period-wrap">
+      <div class="period-label">Pay Period</div>
       <div class="period-toggle">
         <button class="period-btn active" id="btn-weekly">Weekly</button>
         <button class="period-btn" id="btn-biweekly">Bi-Weekly</button>
@@ -390,58 +350,57 @@
     </div>
 
     <!-- INCOME -->
-    <div>
-      <div class="section-label">Take-Home Per Paycheck</div>
-      <div class="income-card">
-        <div class="income-amount" id="incomeDisplay">$0</div>
-        <div class="income-sub" id="incomeSub">per paycheck</div>
-        <div class="input-row">
-          <span class="input-prefix">$</span>
-          <input type="number" id="incomeInput" placeholder="e.g. 2000" />
-        </div>
+    <div class="income-card">
+      <div class="income-label">Take-Home Per Paycheck</div>
+      <div class="income-amount" id="incomeDisplay">$0</div>
+      <div class="income-sub" id="incomeSub">per paycheck</div>
+      <div class="income-input-wrap">
+        <span class="income-prefix">$</span>
+        <input class="income-input" type="number" id="incomeInput" placeholder="e.g. 2000"/>
       </div>
     </div>
 
     <!-- FIXED -->
     <div>
-      <div class="section-label">Fixed Expenses <span id="fixedLbl" style="color:var(--accent2);font-size:10px">(per week)</span></div>
-      <div class="expense-list">
-        <div class="cat-row"><span class="cat-icon">🏠</span><span class="cat-name">Rent / Mortgage</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Rent" data-type="need" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">💡</span><span class="cat-name">Utilities & Bills</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Utilities" data-type="need" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">📱</span><span class="cat-name">Subscriptions</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Subscriptions" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">🚗</span><span class="cat-name">Car / Transport</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Transport" data-type="need" placeholder="0" /></div>
+      <div class="sec-hdr">Fixed Expenses <span id="fixedLbl" style="color:var(--accent);font-size:10px;font-weight:600">(per week)</span></div>
+      <div class="exp-list">
+        <div class="exp-row"><span class="exp-icon">🏠</span><span class="exp-name">Rent</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Rent" data-type="need" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">💡</span><span class="exp-name">Utilities</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Utilities" data-type="need" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">📱</span><span class="exp-name">Subscriptions</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Subscriptions" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">🚗</span><span class="exp-name">Transport</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Transport" data-type="need" placeholder="0"/></div>
       </div>
     </div>
 
     <!-- VARIABLE -->
     <div>
-      <div class="section-label">Variable Expenses <span id="varLbl" style="color:var(--accent2);font-size:10px">(per week)</span></div>
-      <div class="expense-list" id="varList">
-        <div class="cat-row"><span class="cat-icon">🛒</span><span class="cat-name">Groceries</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Groceries" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">🥗</span><span class="cat-name">Nutrition</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Nutrition" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">🍔</span><span class="cat-name">Dining Out</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Dining" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">✈️</span><span class="cat-name">Travel</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Travel" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">🎰</span><span class="cat-name">Sports Betting</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Betting" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">🏋️</span><span class="cat-name">Gym / Sports</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Fitness" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">🎉</span><span class="cat-name">Entertainment</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Entertainment" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">👕</span><span class="cat-name">Shopping</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Shopping" data-type="want" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">💼</span><span class="cat-name">Business</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Business" data-type="want" placeholder="0" /></div>
+      <div class="sec-hdr">Variable Expenses <span id="varLbl" style="color:var(--accent);font-size:10px;font-weight:600">(per week)</span></div>
+      <div class="exp-list" id="varList">
+        <div class="exp-row"><span class="exp-icon">🛒</span><span class="exp-name">Groceries</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Groceries" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">🥗</span><span class="exp-name">Nutrition</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Nutrition" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">🍔</span><span class="exp-name">Dining Out</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Dining" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">✈️</span><span class="exp-name">Travel</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Travel" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">🎰</span><span class="exp-name">Sports Betting</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Betting" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">🏋️</span><span class="exp-name">Gym / Sports</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Fitness" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">🎉</span><span class="exp-name">Entertainment</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Entertainment" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">👕</span><span class="exp-name">Shopping</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Shopping" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">💼</span><span class="exp-name">Business</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Business" data-type="want" placeholder="0"/></div>
       </div>
-      <button class="add-btn" id="addBtn">+ Add custom category</button>
+      <button class="add-cat-btn" id="addBtn">+ Add custom category</button>
     </div>
 
     <!-- SAVINGS -->
     <div>
-      <div class="section-label">Savings & Investing <span id="savLbl" style="color:var(--accent2);font-size:10px">(per week)</span></div>
-      <div class="expense-list">
-        <div class="cat-row"><span class="cat-icon">🏦</span><span class="cat-name">Savings</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Savings" data-type="save" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">📈</span><span class="cat-name">Investing</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Investing" data-type="save" placeholder="0" /></div>
-        <div class="cat-row"><span class="cat-icon">🏛️</span><span class="cat-name">401k / IRA</span><span class="cat-dollar">$</span><input class="cat-input" type="number" data-cat="Retirement" data-type="save" placeholder="0" /></div>
+      <div class="sec-hdr">Savings & Investing <span id="savLbl" style="color:var(--accent);font-size:10px;font-weight:600">(per week)</span></div>
+      <div class="exp-list">
+        <div class="exp-row"><span class="exp-icon">🏦</span><span class="exp-name">Savings</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Savings" data-type="save" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">📈</span><span class="exp-name">Investing</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Investing" data-type="save" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">🏛️</span><span class="exp-name">401k / IRA</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Retirement" data-type="save" placeholder="0"/></div>
       </div>
     </div>
 
   </div>
 
+  <!-- RIGHT PANEL -->
   <div class="right-panel">
 
     <!-- UNALLOCATED BANNER -->
@@ -452,204 +411,252 @@
       <button class="save-period-btn" id="savePeriodBtn">💾 Save This Period</button>
     </div>
 
-    <!-- LEFTOVER BANK -->
-    <div class="bank-card" id="bankCard">
-      <div class="bank-row">
-        <div>
-          <div class="bank-label">Leftover Bank</div>
-          <div class="bank-sub" id="bankSub">Accumulated leftover from saved periods</div>
-        </div>
-        <div class="bank-val" id="bankVal">$0</div>
-      </div>
-      <div class="bank-actions" id="bankActions" style="display:none">
-        <button class="bank-btn" id="useFromBankBtn">Use from bank</button>
-        <button class="bank-btn secondary" id="viewHistoryBtn">View history</button>
-      </div>
-    </div>
-
-    <!-- HISTORY MODAL -->
-    <div class="modal-overlay" id="historyModal">
-      <div class="modal">
-        <div class="modal-title">📊 Pay Period History</div>
-        <div class="modal-sub">Snapshots of your saved pay periods, most recent first.</div>
-        <div id="historyList"></div>
-        <div class="modal-actions">
-          <button class="modal-btn secondary" id="closeHistoryBtn">Close</button>
-        </div>
-      </div>
-    </div>
-
     <!-- STATS -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-label">Monthly Income</div>
+        <div class="stat-lbl">Monthly Income</div>
         <div class="stat-val c-purple" id="statIncome">$0</div>
         <div class="stat-sub" id="statIncomeSub">$0/year</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Monthly Expenses</div>
+        <div class="stat-lbl">Monthly Expenses</div>
         <div class="stat-val c-red" id="statExp">$0</div>
         <div class="stat-sub">allocated</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Remaining</div>
+        <div class="stat-lbl">Remaining</div>
         <div class="stat-val" id="statRem">$0</div>
         <div class="stat-sub" id="statRemLbl">left over / mo</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Savings Rate</div>
+        <div class="stat-lbl">Savings Rate</div>
         <div class="stat-val c-blue" id="statSavRate">0%</div>
         <div class="stat-sub">of income</div>
       </div>
     </div>
 
-    <!-- HEALTH -->
-    <div class="health-card">
-      <div class="health-top">
-        <h3>Budget Health</h3>
-        <div class="badge badge-yellow" id="healthBadge">No data</div>
+    <!-- OVERVIEW ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">📊</span> Spending Overview</div>
+        <span class="acc-chevron open">▼</span>
       </div>
-      <div class="bar-row"><span class="bar-lbl">Needs</span><div class="bar-track"><div class="bar-fill" id="needsBar" style="width:0%;background:var(--blue)"></div></div><span class="bar-pct" id="needsPct">0%</span></div>
-      <div class="bar-row"><span class="bar-lbl">Wants</span><div class="bar-track"><div class="bar-fill" id="wantsBar" style="width:0%;background:var(--orange)"></div></div><span class="bar-pct" id="wantsPct">0%</span></div>
-      <div class="bar-row"><span class="bar-lbl">Savings</span><div class="bar-track"><div class="bar-fill" id="savBar" style="width:0%;background:var(--green)"></div></div><span class="bar-pct" id="savPct">0%</span></div>
+      <div class="acc-body open">
+        <div class="charts-grid">
+          <div class="chart-box">
+            <h4>Breakdown by Category</h4>
+            <div class="donut-wrap" id="donutWrap">
+              <div class="empty"><div class="emoji">📊</div>Enter expenses to see breakdown</div>
+            </div>
+          </div>
+          <div class="chart-box">
+            <h4>50 / 30 / 20 Rule</h4>
+            <div class="rule-grid">
+              <div class="rule-box" style="background:var(--blue-bg);border-color:#bfdbfe">
+                <div class="rule-pct c-blue" id="r50">0%</div>
+                <div class="rule-lbl">Needs</div>
+                <div class="rule-target" style="background:var(--blue-bg);color:var(--blue)">Target ≤50%</div>
+              </div>
+              <div class="rule-box" style="background:var(--yellow-bg);border-color:#fde68a">
+                <div class="rule-pct" style="color:var(--yellow)" id="r30">0%</div>
+                <div class="rule-lbl">Wants</div>
+                <div class="rule-target" style="background:var(--yellow-bg);color:var(--yellow)">Target ≤30%</div>
+              </div>
+              <div class="rule-box" style="background:var(--green-bg);border-color:var(--green-border)">
+                <div class="rule-pct c-green" id="r20">0%</div>
+                <div class="rule-lbl">Savings</div>
+                <div class="rule-target" style="background:var(--green-bg);color:var(--green)">Target ≥20%</div>
+              </div>
+            </div>
+            <div style="margin-top:14px">
+              <div class="bar-row"><span class="bar-lbl">Needs</span><div class="bar-track"><div class="bar-fill" id="r50bar" style="width:0%;background:var(--blue)"></div></div></div>
+              <div class="bar-row"><span class="bar-lbl">Wants</span><div class="bar-track"><div class="bar-fill" id="r30bar" style="width:0%;background:var(--yellow)"></div></div></div>
+              <div class="bar-row"><span class="bar-lbl">Savings</span><div class="bar-track"><div class="bar-fill" id="r20bar" style="width:0%;background:var(--green)"></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="health-section">
+          <div class="health-top">
+            <div class="health-title">Budget Health</div>
+            <div class="badge badge-yellow" id="healthBadge">No data</div>
+          </div>
+          <div class="bar-row"><span class="bar-lbl">Needs</span><div class="bar-track"><div class="bar-fill" id="needsBar" style="width:0%;background:var(--blue)"></div></div><span class="bar-pct" id="needsPct">0%</span></div>
+          <div class="bar-row"><span class="bar-lbl">Wants</span><div class="bar-track"><div class="bar-fill" id="wantsBar" style="width:0%;background:var(--orange)"></div></div><span class="bar-pct" id="wantsPct">0%</span></div>
+          <div class="bar-row"><span class="bar-lbl">Savings</span><div class="bar-track"><div class="bar-fill" id="savBar" style="width:0%;background:var(--green)"></div></div><span class="bar-pct" id="savPct">0%</span></div>
+        </div>
+        <div class="week-grid" style="margin-top:16px">
+          <div class="week-col"><div class="week-lbl">Week 1</div><div class="week-bar-wrap"><div class="week-bar" id="w1bar" style="height:0"></div></div><div class="week-amt" id="w1amt">$0</div></div>
+          <div class="week-col"><div class="week-lbl">Week 2</div><div class="week-bar-wrap"><div class="week-bar" id="w2bar" style="height:0"></div></div><div class="week-amt" id="w2amt">$0</div></div>
+          <div class="week-col"><div class="week-lbl">Week 3</div><div class="week-bar-wrap"><div class="week-bar" id="w3bar" style="height:0"></div></div><div class="week-amt" id="w3amt">$0</div></div>
+          <div class="week-col"><div class="week-lbl">Week 4</div><div class="week-bar-wrap"><div class="week-bar" id="w4bar" style="height:0"></div></div><div class="week-amt" id="w4amt">$0</div></div>
+        </div>
+      </div>
     </div>
 
-    <!-- CHARTS -->
-    <div class="charts-grid">
-      <div class="chart-card">
-        <h3>Spending Breakdown</h3>
-        <div id="donutWrap"><div class="empty"><div class="emoji">📊</div>Enter expenses to see breakdown</div></div>
+    <!-- TRANSACTIONS ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">💳</span> Transactions <span class="acc-badge" id="txnBadge" style="display:none"></span></div>
+        <span class="acc-chevron">▼</span>
       </div>
-      <div class="chart-card">
-        <h3>50 / 30 / 20 Rule</h3>
-        <div class="rule-grid">
-          <div class="rule-box" style="background:#0f1f2e"><div class="rule-pct c-blue" id="r50">0%</div><div class="rule-lbl">Needs</div><div class="rule-target" style="color:var(--blue)">Target ≤50%</div></div>
-          <div class="rule-box" style="background:#2a1a0e"><div class="rule-pct" style="color:var(--yellow)" id="r30">0%</div><div class="rule-lbl">Wants</div><div class="rule-target" style="color:var(--yellow)">Target ≤30%</div></div>
-          <div class="rule-box" style="background:#0f2a17"><div class="rule-pct c-green" id="r20">0%</div><div class="rule-lbl">Savings</div><div class="rule-target" style="color:var(--green)">Target ≥20%</div></div>
-        </div>
-        <div style="margin-top:12px">
-          <div class="bar-row"><span class="bar-lbl" style="font-size:11px">Needs</span><div class="bar-track"><div class="bar-fill" id="r50bar" style="width:0%;background:var(--blue)"></div></div></div>
-          <div class="bar-row"><span class="bar-lbl" style="font-size:11px">Wants</span><div class="bar-track"><div class="bar-fill" id="r30bar" style="width:0%;background:var(--yellow)"></div></div></div>
-          <div class="bar-row"><span class="bar-lbl" style="font-size:11px">Savings</span><div class="bar-track"><div class="bar-fill" id="r20bar" style="width:0%;background:var(--green)"></div></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- GOAL -->
-    <div class="goal-card">
-      <h3>🎯 Savings Goal</h3>
-      <div class="goal-inputs">
-        <label>Goal:</label>
-        <div class="input-row" style="width:160px"><span class="input-prefix">$</span><input type="number" id="goalInput" placeholder="e.g. 10000" style="font-size:14px;padding:8px 10px" /></div>
-        <label>Saved so far:</label>
-        <div class="input-row" style="width:140px"><span class="input-prefix">$</span><input type="number" id="savedInput" placeholder="0" style="font-size:14px;padding:8px 10px" /></div>
-      </div>
-      <div class="goal-track"><div class="goal-fill" id="goalFill" style="width:0%"></div></div>
-      <div class="goal-labels"><span id="goalSaved">$0 saved</span><span id="goalPct">0%</span><span id="goalTarget">Goal: $0</span></div>
-      <div class="goal-months" id="goalMonths"></div>
-    </div>
-
-    <!-- HYSA TRACKER -->
-    <div class="hysa-card">
-      <div class="hysa-header">
-        <div>
-          <h3>🏦 High Yield Savings (HYSA)</h3>
-          <div class="hysa-sub">Tracks your HYSA balance + projected growth</div>
-        </div>
-        <div class="hysa-apy-wrap">
-          <input type="number" id="hysa-apy" placeholder="4.5" step="0.1" min="0" max="20" />
-          <span class="hysa-apy-label">% APY</span>
-        </div>
-      </div>
-      <div class="hysa-inputs">
-        <div class="hysa-input-group">
-          <label>Current Balance</label>
-          <div class="input-row">
-            <span class="input-prefix">$</span>
-            <input type="number" id="hysa-balance" placeholder="e.g. 5000" style="font-size:15px;padding:10px 12px;background:transparent;border:none;outline:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;width:100%"/>
+      <div class="acc-body">
+        <div id="txnContent">
+          <div class="txn-empty">
+            <div class="emoji">💳</div>
+            Import your Amex statement using the button at the top right to see your transactions broken down here.
           </div>
         </div>
       </div>
-      <div class="hysa-stats" id="hysaStats" style="display:none">
-        <div class="hysa-stat">
-          <div class="hysa-stat-val" id="hysaInterestMonth">$0</div>
-          <div class="hysa-stat-lbl">Interest/month</div>
-        </div>
-        <div class="hysa-stat">
-          <div class="hysa-stat-val" id="hysaInterestYear">$0</div>
-          <div class="hysa-stat-lbl">Interest/year</div>
-        </div>
-        <div class="hysa-stat">
-          <div class="hysa-stat-val" id="hysaTotal1yr">$0</div>
-          <div class="hysa-stat-lbl">Balance in 1yr</div>
-        </div>
+    </div>
+
+    <!-- TRENDS ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">📈</span> Trends Over Time</div>
+        <span class="acc-chevron">▼</span>
       </div>
-      <div class="hysa-projection" id="hysaProjection" style="display:none">
-        <div class="hysa-proj-title">Balance projection with monthly contributions</div>
-        <div class="hysa-bars" id="hysaBars"></div>
-        <div class="hysa-proj-note" id="hysaProjNote"></div>
+      <div class="acc-body">
+        <div id="trendsContent">
+          <div class="trend-empty">Save a few pay periods to start seeing trends.</div>
+        </div>
       </div>
     </div>
 
-    <!-- WISHLIST -->
-    <div class="wish-card">
-      <div class="wish-header">
-        <h3>🛍️ Wishlist</h3>
-        <span class="wish-count" id="wishCount">0 items</span>
+    <!-- SAVINGS ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">🎯</span> Savings Goal</div>
+        <span class="acc-chevron">▼</span>
       </div>
-      <div class="wish-add-row">
-        <input class="form-input" type="text" id="wishName" placeholder="Item name..." style="flex:2;padding:10px 12px"/>
-        <div class="input-row" style="flex:1">
-          <span class="input-prefix">$</span>
-          <input type="number" id="wishPrice" placeholder="Price" style="font-size:14px;padding:9px 10px;background:transparent;border:none;outline:none;color:var(--text);font-family:'Space Grotesk',sans-serif;font-weight:600;width:100%"/>
+      <div class="acc-body">
+        <div class="goal-inputs">
+          <label>Goal:</label>
+          <div class="input-row-light"><span class="input-prefix-light">$</span><input type="number" id="goalInput" placeholder="e.g. 10000"/></div>
+          <label>Saved so far:</label>
+          <div class="input-row-light"><span class="input-prefix-light">$</span><input type="number" id="savedInput" placeholder="0"/></div>
         </div>
-        <button class="wish-add-btn" id="wishAddBtn">+ Add</button>
+        <div class="goal-track"><div class="goal-fill" id="goalFill" style="width:0%"></div></div>
+        <div class="goal-labels"><span id="goalSaved">$0 saved</span><span id="goalPct">0%</span><span id="goalTarget">Goal: $0</span></div>
+        <div class="goal-months" id="goalMonths"></div>
       </div>
-      <div id="wishList"></div>
     </div>
 
-
-      <h3>📅 Weekly Spending Budget</h3>
-      <div class="week-grid">
-        <div class="week-col"><div class="wlbl">Week 1</div><div class="wbar-wrap"><div class="wbar" id="w1bar" style="height:0"></div></div><div class="wamt" id="w1amt">$0</div></div>
-        <div class="week-col"><div class="wlbl">Week 2</div><div class="wbar-wrap"><div class="wbar" id="w2bar" style="height:0"></div></div><div class="wamt" id="w2amt">$0</div></div>
-        <div class="week-col"><div class="wlbl">Week 3</div><div class="wbar-wrap"><div class="wbar" id="w3bar" style="height:0"></div></div><div class="wamt" id="w3amt">$0</div></div>
-        <div class="week-col"><div class="wlbl">Week 4</div><div class="wbar-wrap"><div class="wbar" id="w4bar" style="height:0"></div></div><div class="wamt" id="w4amt">$0</div></div>
+    <!-- HYSA ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">🏦</span> High Yield Savings (HYSA)</div>
+        <span class="acc-chevron">▼</span>
       </div>
-      <div style="margin-top:10px;font-size:12px;color:var(--muted)">Variable spending ÷ 4 weeks</div>
+      <div class="acc-body">
+        <div class="hysa-header">
+          <div><h4>HYSA Balance & Projection</h4><div class="hysa-sub-lbl">Enter your current balance to see interest earned</div></div>
+          <div class="hysa-apy-wrap"><input type="number" id="hysa-apy" placeholder="4.0" step="0.1" min="0" max="20"/><span class="hysa-apy-label">% APY</span></div>
+        </div>
+        <div class="input-row-light" style="margin-bottom:14px"><span class="input-prefix-light">$</span><input type="number" id="hysa-balance" placeholder="e.g. 5000" style="width:160px"/></div>
+        <div class="hysa-stats" id="hysaStats" style="display:none">
+          <div class="hysa-stat"><div class="hysa-stat-val" id="hysaInterestMonth">$0</div><div class="hysa-stat-lbl">Interest/month</div></div>
+          <div class="hysa-stat"><div class="hysa-stat-val" id="hysaInterestYear">$0</div><div class="hysa-stat-lbl">Interest/year</div></div>
+          <div class="hysa-stat"><div class="hysa-stat-val" id="hysaTotal1yr">$0</div><div class="hysa-stat-lbl">Balance in 1yr</div></div>
+        </div>
+        <div id="hysaProjection" style="display:none">
+          <div class="hysa-proj-title">12-Month Projection</div>
+          <div class="hysa-bars" id="hysaBars"></div>
+          <div class="hysa-proj-note" id="hysaProjNote"></div>
+        </div>
+      </div>
     </div>
 
-    <!-- AI TIPS -->
-    <div class="tips-card">
-      <div class="tips-header">
-        <span class="ai-badge">AI</span>
-        <h3>Personalized Guidance</h3>
+    <!-- LEFTOVER BANK ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">🏧</span> Leftover Bank</div>
+        <span class="acc-chevron">▼</span>
       </div>
-      <div class="tip-list" id="tipList">
-        <div class="empty"><div class="emoji">💡</div>Enter your income and expenses above to get personalized guidance.</div>
+      <div class="acc-body">
+        <div class="bank-card" style="box-shadow:none;border:none;padding:0;margin-bottom:14px">
+          <div class="bank-row">
+            <div><div class="bank-label">Accumulated Balance</div><div class="bank-sub" id="bankSub">Save a pay period to start tracking</div></div>
+            <div class="bank-val" id="bankVal">$0</div>
+          </div>
+          <div class="bank-actions" id="bankActions" style="display:none">
+            <button class="bank-btn" id="useFromBankBtn">Use from bank</button>
+            <button class="bank-btn" id="viewHistoryBtn">View history</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WISHLIST ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">🛍️</span> Wishlist <span class="acc-badge" id="wishBadge" style="display:none"></span></div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="wish-add-row">
+          <input class="wish-name-input" type="text" id="wishName" placeholder="Item name..."/>
+          <input class="wish-price-input" type="number" id="wishPrice" placeholder="Price"/>
+          <button class="wish-add-btn" id="wishAddBtn">+ Add</button>
+        </div>
+        <div id="wishList"><div class="empty"><div class="emoji">🛍️</div>Add items you want to save up for</div></div>
+      </div>
+    </div>
+
+    <!-- AI GUIDANCE ACCORDION -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <div class="acc-title"><span class="acc-icon">💡</span> AI Guidance</div>
+        <span class="acc-chevron">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="tip-list" id="tipList">
+          <div class="empty"><div class="emoji">💡</div>Enter your income and expenses to get personalized guidance.</div>
+        </div>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- IMPORT STATEMENT MODAL -->
+<!-- IMPORT MODAL -->
 <div class="modal-overlay" id="importModal">
   <div class="modal">
-    <div class="modal-title">📄 Import Credit Card Statement</div>
-    <div class="modal-sub">Paste your CSV (Amex format: Date, Description, Amount, ..., Category) — works with raw CSV or copy-pasted from Excel/Google Sheets. Processed entirely in your browser — never saved or uploaded anywhere.</div>
-    <div class="privacy-note" style="margin-top:0;margin-bottom:14px">📅 <b>Tip:</b> Totals are applied directly as your "per pay period" amounts. Make sure your pay period toggle (Weekly / Bi-Weekly / Monthly) matches the date range of the statement you're pasting — e.g. if this CSV covers 2 weeks, switch to <b>Bi-Weekly</b> first.</div>
+    <div class="modal-title">📄 Import Statement</div>
+    <div class="modal-sub">Paste your CSV (Amex format) — works with raw CSV or copy-pasted from Excel/Google Sheets.</div>
+    <div class="privacy-note" style="margin-bottom:14px">📅 <b>Tip:</b> Match your pay period toggle to the statement date range (e.g. Bi-Weekly for a 2-week statement) before importing.</div>
     <textarea id="csvInput" placeholder="Paste your CSV content here, including the header row..."></textarea>
     <div class="modal-actions">
       <button class="modal-btn secondary" id="closeImportBtn">Cancel</button>
       <button class="modal-btn primary" id="parseCsvBtn">Analyze Transactions</button>
     </div>
     <div id="reviewSection" style="display:none"></div>
-    <div class="privacy-note">🔒 This data is processed locally in your browser only. Nothing is uploaded, stored, or sent anywhere — closing this window clears it completely.</div>
+    <div class="privacy-note">🔒 Processed locally in your browser only — never saved or uploaded anywhere.</div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <div class="modal-title">📊 Pay Period History</div>
+    <div class="modal-sub">Snapshots of your saved pay periods, most recent first.</div>
+    <div id="historyList"></div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="closeHistoryBtn">Close</button>
+    </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+
+<script>
+function toggleAcc(header){
+  var body = header.nextElementSibling;
+  var chevron = header.querySelector('.acc-chevron');
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+</script>
 
 <script>
 (function() {
@@ -956,6 +963,7 @@
     renderBank();
     currentLeftoverBank=bankTotal;
     renderWishlist();
+    renderTrends();
     toast('Period saved! '+(snapshot.leftoverPerPeriod>=0?'+':'')+fmt(snapshot.leftoverPerPeriod)+' added to bank');
   });
 
@@ -1009,11 +1017,13 @@
   // -- WISHLIST ----------------------------------------------
   function renderWishlist(){
     var listEl  = document.getElementById('wishList');
-    var countEl = document.getElementById('wishCount');
     var active  = wishlist.filter(function(w){ return !w.bought; });
-    countEl.textContent = active.length+' item'+(active.length!==1?'s':'');
+    // update badge
+    var badge = document.getElementById('wishBadge');
+    if(active.length>0){ badge.textContent=active.length; badge.style.display='inline-block'; }
+    else{ badge.style.display='none'; }
     if(!wishlist.length){
-      listEl.innerHTML='<div class="wish-empty">No items yet — add something you want to save up for!</div>';
+      listEl.innerHTML='<div class="empty"><div class="emoji">🛍️</div>Add items you want to save up for</div>';
       return;
     }
     listEl.innerHTML=wishlist.map(function(item,idx){
@@ -1219,8 +1229,130 @@
     document.getElementById('importModal').classList.remove('open');
     document.getElementById('reviewSection').innerHTML='';
     runUpdate();
+    renderTransactions();
     toast('Statement applied to budget!');
   }
+
+  // ── TRANSACTIONS VIEW ────────────────────────────────────
+  var CAT_COLORS = {
+    'Groceries':'#10b981','Dining':'#f97316','Shopping':'#6c63ff','Rent':'#3b82f6',
+    'Utilities':'#8b5cf6','Transport':'#0ea5e9','Travel':'#f59e0b','Betting':'#ef4444',
+    'Fitness':'#22c55e','Entertainment':'#ec4899','Subscriptions':'#06b6d4',
+    'Nutrition':'#84cc16','Business':'#64748b','Savings':'#10b981','Investing':'#3b82f6','Retirement':'#7c3aed'
+  };
+  var activeFilter = 'All';
+
+  function renderTransactions(){
+    var content = document.getElementById('txnContent');
+    var badge   = document.getElementById('txnBadge');
+    if(!parsedTxns || !parsedTxns.length){
+      content.innerHTML='<div class="txn-empty"><div class="emoji">💳</div>Import your Amex statement to see transactions here.</div>';
+      badge.style.display='none'; return;
+    }
+    badge.textContent = parsedTxns.length+' txns';
+    badge.style.display='inline-block';
+
+    // summary
+    var total    = parsedTxns.reduce(function(s,t){return s+t.amount;},0);
+    var catTotals= {};
+    parsedTxns.forEach(function(t){ catTotals[t.category]=(catTotals[t.category]||0)+t.amount; });
+    var topCat   = Object.keys(catTotals).sort(function(a,b){return catTotals[b]-catTotals[a];})[0]||'';
+
+    var cats = ['All'].concat(Object.keys(catTotals).sort());
+    var filtered = activeFilter==='All' ? parsedTxns : parsedTxns.filter(function(t){return t.category===activeFilter;});
+
+    var chips = cats.map(function(c){
+      return '<button class="txn-chip'+(c===activeFilter?' active':'')+'" onclick="setTxnFilter(\''+c+'\')">'+c+'</button>';
+    }).join('');
+
+    var items = filtered.map(function(t){
+      var color = CAT_COLORS[t.category]||'#8b90a7';
+      return '<div class="txn-item">'+
+        '<div class="txn-dot" style="background:'+color+'"></div>'+
+        '<div class="txn-info"><div class="txn-name">'+escapeHtml(t.description)+'</div><div class="txn-cat">'+t.category+'</div></div>'+
+        '<div class="txn-date">'+(t.date||'')+'</div>'+
+        '<div class="txn-amt">$'+t.amount.toFixed(2)+'</div>'+
+      '</div>';
+    }).join('');
+
+    content.innerHTML=
+      '<div class="txn-summary">'+
+        '<div class="txn-sum-card"><div class="txn-sum-val">'+parsedTxns.length+'</div><div class="txn-sum-lbl">Transactions</div></div>'+
+        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:var(--red)">$'+total.toFixed(2)+'</div><div class="txn-sum-lbl">Total Spent</div></div>'+
+        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:var(--accent);font-size:13px">'+topCat+'</div><div class="txn-sum-lbl">Top Category</div></div>'+
+      '</div>'+
+      '<div class="txn-filter-row">'+chips+'</div>'+
+      '<div class="txn-list">'+items+'</div>';
+  }
+
+  function setTxnFilter(cat){
+    activeFilter = cat;
+    renderTransactions();
+  }
+
+  // ── TRENDS VIEW ──────────────────────────────────────────
+  function renderTrends(){
+    var content = document.getElementById('trendsContent');
+    if(!payHistory || payHistory.length < 2){
+      content.innerHTML='<div class="trend-empty">Save at least 2 pay periods to start seeing trends.</div>';
+      return;
+    }
+    var recent = payHistory.slice(0,8).reverse();
+
+    // Leftover trend
+    var maxLeft = Math.max.apply(null, recent.map(function(h){return Math.abs(h.leftoverPerPeriod);})) || 1;
+    var leftBars = recent.map(function(h){
+      var pct = Math.abs(h.leftoverPerPeriod)/maxLeft;
+      var h2  = Math.max(6, Math.round(pct*60));
+      var col = h.leftoverPerPeriod>=0?'var(--green)':'var(--red)';
+      var d   = new Date(h.date+'T12:00:00');
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end">'+
+        '<div style="width:100%;height:'+h2+'px;background:'+col+';border-radius:3px 3px 0 0"></div>'+
+        '<div class="trend-lbl">'+(d.getMonth()+1)+'/'+d.getDate()+'</div>'+
+      '</div>';
+    }).join('');
+
+    // Spending categories across periods
+    var allCats={};
+    payHistory.forEach(function(h){ Object.keys(h.categories||{}).forEach(function(c){allCats[c]=true;}); });
+    var catKeys = Object.keys(allCats).filter(function(c){return !['Savings','Investing','Retirement'].includes(c);}).slice(0,5);
+
+    var catBarsHtml = catKeys.map(function(cat){
+      var vals = recent.map(function(h){return (h.categories&&h.categories[cat])||0;});
+      var maxV = Math.max.apply(null,vals)||1;
+      var bars = vals.map(function(v){
+        var h2=Math.max(4,Math.round((v/maxV)*60));
+        var col=CAT_COLORS[cat]||'var(--accent)';
+        return '<div style="flex:1;height:'+h2+'px;background:'+col+';border-radius:2px 2px 0 0;opacity:0.85"></div>';
+      }).join('');
+      return '<div class="trend-card"><div class="trend-title">'+cat+'</div><div class="trend-bars">'+bars+'</div></div>';
+    }).join('');
+
+    content.innerHTML=
+      '<div class="trends-grid">'+
+        '<div class="trend-card"><div class="trend-title">Leftover Per Period</div><div class="trend-bars" style="height:70px;gap:6px">'+leftBars+'</div></div>'+
+        catKeys.slice(0,1).map(function(cat){
+          var vals=recent.map(function(h){return (h.categories&&h.categories[cat])||0;});
+          var maxV=Math.max.apply(null,vals)||1;
+          var bars=vals.map(function(v){
+            var h2=Math.max(4,Math.round((v/maxV)*60));
+            return '<div style="flex:1;height:'+h2+'px;background:'+(CAT_COLORS[cat]||'var(--accent)')+';border-radius:2px 2px 0 0;opacity:0.85"></div>';
+          }).join('');
+          return '<div class="trend-card"><div class="trend-title">'+cat+'</div><div class="trend-bars" style="gap:4px">'+bars+'</div></div>';
+        }).join('')+
+      '</div>'+
+      (catKeys.length>1?'<div class="trends-grid" style="margin-top:10px">'+catKeys.slice(1,5).map(function(cat){
+        var vals=recent.map(function(h){return (h.categories&&h.categories[cat])||0;});
+        var maxV=Math.max.apply(null,vals)||1;
+        var bars=vals.map(function(v){
+          var h2=Math.max(4,Math.round((v/maxV)*60));
+          return '<div style="flex:1;height:'+h2+'px;background:'+(CAT_COLORS[cat]||'var(--accent)')+';border-radius:2px 2px 0 0;opacity:0.85"></div>';
+        }).join('');
+        return '<div class="trend-card"><div class="trend-title">'+cat+'</div><div class="trend-bars" style="gap:4px">'+bars+'</div></div>';
+      }).join('')+'</div>':'');
+  }
+
+
 
   // ── HYSA TRACKER ─────────────────────────────────────────
   var HYSA_KEY = 'djd_finance_hysa_v1';
@@ -1285,9 +1417,12 @@
   wireInputs();
   renderBank();
   renderWishlist();
+  renderTrends();
+  renderTransactions();
   runUpdate();
 
 })();
 </script>
+
 </body>
 </html>
