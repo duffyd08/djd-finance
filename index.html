@@ -1239,9 +1239,9 @@ function toggleAcc(header){
   // ── TRANSACTIONS VIEW ────────────────────────────────────
   var CAT_COLORS = {
     'Groceries':'#10b981','Dining':'#f97316','Shopping':'#6c63ff','Rent':'#3b82f6',
-    'Utilities':'#8b5cf6','Transport':'#0ea5e9','Travel':'#f59e0b','Betting':'#ef4444',
-    'Fitness':'#22c55e','Entertainment':'#ec4899','Subscriptions':'#06b6d4',
-    'Nutrition':'#84cc16','Business':'#64748b','Savings':'#10b981','Investing':'#3b82f6','Retirement':'#7c3aed'
+    'Utilities':'#8b5cf6','Transport':'#0ea5e9','Gas':'#f59e0b','Travel':'#06b6d4',
+    'Betting':'#ef4444','Fitness':'#22c55e','Entertainment':'#ec4899','Subscriptions':'#64748b',
+    'Nutrition':'#84cc16','Business':'#475569','Savings':'#10b981','Investing':'#3b82f6','Retirement':'#7c3aed'
   };
   var activeFilter = 'All';
 
@@ -1261,36 +1261,108 @@ function toggleAcc(header){
     badge.textContent = parsedTxns.length+' txns';
     badge.style.display='inline-block';
 
-    // summary
-    var total    = parsedTxns.reduce(function(s,t){return s+t.amount;},0);
-    var catTotals= {};
+    // ── totals ───────────────────────────────────────────
+    var grandTotal = parsedTxns.reduce(function(s,t){return s+t.amount;},0);
+    var catTotals  = {};
     parsedTxns.forEach(function(t){ catTotals[t.category]=(catTotals[t.category]||0)+t.amount; });
-    var topCat   = Object.keys(catTotals).sort(function(a,b){return catTotals[b]-catTotals[a];})[0]||'';
+    var topCat = Object.keys(catTotals).sort(function(a,b){return catTotals[b]-catTotals[a];})[0]||'';
 
-    var cats = ['All'].concat(Object.keys(catTotals).sort());
-    var filtered = activeFilter==='All' ? parsedTxns : parsedTxns.filter(function(t){return t.category===activeFilter;});
+    // ── filtered set ─────────────────────────────────────
+    var isAll    = activeFilter==='All';
+    var filtered = isAll ? parsedTxns : parsedTxns.filter(function(t){return t.category===activeFilter;});
+    var filtTotal= filtered.reduce(function(s,t){return s+t.amount;},0);
 
+    // ── % of income ──────────────────────────────────────
+    var cfg           = PERIODS[currentPeriod];
+    var paycheck      = parseFloat(document.getElementById('incomeInput').value)||0;
+    var monthlyIncome = paycheck * cfg.perMonth;
+    var pctOfIncome   = monthlyIncome>0 ? Math.round((filtTotal/monthlyIncome)*100) : 0;
+
+    // ── change vs previous period ─────────────────────────
+    var changePct   = null;
+    var changeDir   = null;
+    var changeAmt   = null;
+    if(!isAll && payHistory && payHistory.length >= 1){
+      // most recent saved period
+      var prev = payHistory[0];
+      var prevCatVal = (prev.categories && prev.categories[activeFilter]) || 0;
+      // prevCatVal is per-period; filtTotal is the statement total for this period
+      // compare directly (both represent the same period length)
+      if(prevCatVal > 0){
+        changeAmt = filtTotal - prevCatVal;
+        changePct = Math.round(Math.abs(changeAmt)/prevCatVal*100);
+        changeDir = changeAmt >= 0 ? 'up' : 'down';
+      }
+    }
+
+    // ── category stat strip ──────────────────────────────
+    var catColor = CAT_COLORS[activeFilter]||'var(--accent)';
+    var changeHtml = '';
+    if(changePct !== null){
+      var arrow  = changeDir==='up' ? '↑' : '↓';
+      var col    = changeDir==='up' ? 'var(--red)' : 'var(--green)';
+      var label  = changeDir==='up' ? 'more than last period' : 'less than last period';
+      changeHtml = '<div class="txn-sum-card">'+
+        '<div class="txn-sum-val" style="color:'+col+'">'+arrow+' '+changePct+'%</div>'+
+        '<div class="txn-sum-lbl">'+changeAmt>0?'+':''+(changeAmt>=0?'+':'')+' $'+Math.abs(changeAmt).toFixed(0)+' vs last period</div>'+
+      '</div>';
+    }
+
+    var statCards = isAll
+      ? '<div class="txn-sum-card"><div class="txn-sum-val">'+parsedTxns.length+'</div><div class="txn-sum-lbl">Transactions</div></div>'+
+        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:var(--red)">$'+grandTotal.toFixed(2)+'</div><div class="txn-sum-lbl">Total Spent</div></div>'+
+        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:var(--accent);font-size:13px">'+topCat+'</div><div class="txn-sum-lbl">Top Category</div></div>'
+      : '<div class="txn-sum-card"><div class="txn-sum-val">'+filtered.length+'</div><div class="txn-sum-lbl">Transactions</div></div>'+
+        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:'+catColor+'">$'+filtTotal.toFixed(2)+'</div><div class="txn-sum-lbl">Spent on '+activeFilter+'</div></div>'+
+        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:var(--muted)">'+pctOfIncome+'%</div><div class="txn-sum-lbl">of monthly income</div></div>'+
+        (changePct!==null
+          ? '<div class="txn-sum-card"><div class="txn-sum-val" style="color:'+(changeDir==='up'?'var(--red)':'var(--green)')+'">'+(changeDir==='up'?'↑':'↓')+' '+changePct+'%</div><div class="txn-sum-lbl">'+(changeAmt>=0?'+':'')+'$'+changeAmt.toFixed(0)+' vs last period</div></div>'
+          : '');
+
+    // ── category bar showing % of total ──────────────────
+    var catBarHtml = '';
+    if(!isAll){
+      var pctOfTotal = grandTotal>0 ? Math.round((filtTotal/grandTotal)*100) : 0;
+      catBarHtml = '<div style="margin:10px 0 4px;display:flex;align-items:center;gap:10px;font-size:12px">'+
+        '<span style="color:var(--muted);font-weight:600;width:80px">% of total</span>'+
+        '<div style="flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;border:1px solid var(--border)">'+
+          '<div style="height:100%;width:'+pctOfTotal+'%;background:'+catColor+';border-radius:4px;transition:width 0.4s"></div>'+
+        '</div>'+
+        '<span style="color:var(--muted);font-weight:600;width:28px;text-align:right">'+pctOfTotal+'%</span>'+
+      '</div>';
+    }
+
+    // ── chips ─────────────────────────────────────────────
+    var cats  = ['All'].concat(Object.keys(catTotals).sort());
     var chips = cats.map(function(c){
-      return '<button class="txn-chip'+(c===activeFilter?' active':'')+'" onclick="setTxnFilter(\''+c+'\')">'+c+'</button>';
+      var col = CAT_COLORS[c]||'';
+      var dot = c!=='All' ? '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+(CAT_COLORS[c]||'#8b90a7')+';margin-right:4px;vertical-align:middle"></span>' : '';
+      return '<button class="txn-chip'+(c===activeFilter?' active':'')+'" onclick="setTxnFilter(\''+c+'\')">'+dot+c+'</button>';
     }).join('');
 
+    // ── items ─────────────────────────────────────────────
     var items = filtered.map(function(t){
       var color = CAT_COLORS[t.category]||'#8b90a7';
+      var pctItem = filtTotal>0 ? Math.round((t.amount/filtTotal)*100) : 0;
       return '<div class="txn-item">'+
         '<div class="txn-dot" style="background:'+color+'"></div>'+
-        '<div class="txn-info"><div class="txn-name">'+escapeHtml(t.description)+'</div><div class="txn-cat">'+t.category+'</div></div>'+
+        '<div class="txn-info">'+
+          '<div class="txn-name">'+escapeHtml(t.description)+'</div>'+
+          '<div class="txn-cat">'+t.category+(isAll?'':' &nbsp;·&nbsp; '+pctItem+'% of category')+'</div>'+
+        '</div>'+
         '<div class="txn-date">'+(t.date||'')+'</div>'+
         '<div class="txn-amt">$'+t.amount.toFixed(2)+'</div>'+
       '</div>';
     }).join('');
 
+    var summaryGrid = isAll
+      ? 'grid-template-columns:repeat(3,1fr)'
+      : (changePct!==null ? 'grid-template-columns:repeat(4,1fr)' : 'grid-template-columns:repeat(3,1fr)');
+
     content.innerHTML=
-      '<div class="txn-summary">'+
-        '<div class="txn-sum-card"><div class="txn-sum-val">'+parsedTxns.length+'</div><div class="txn-sum-lbl">Transactions</div></div>'+
-        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:var(--red)">$'+total.toFixed(2)+'</div><div class="txn-sum-lbl">Total Spent</div></div>'+
-        '<div class="txn-sum-card"><div class="txn-sum-val" style="color:var(--accent);font-size:13px">'+topCat+'</div><div class="txn-sum-lbl">Top Category</div></div>'+
-      '</div>'+
-      '<div class="txn-filter-row">'+chips+'</div>'+
+      '<div class="txn-summary" style="'+summaryGrid+'">'+statCards+'</div>'+
+      catBarHtml+
+      '<div class="txn-filter-row" style="margin-top:12px">'+chips+'</div>'+
       '<div class="txn-list">'+items+'</div>';
   }
 
