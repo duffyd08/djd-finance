@@ -377,6 +377,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;
       <div class="exp-list" id="varList">
         <div class="exp-row"><span class="exp-icon">🛒</span><span class="exp-name">Groceries</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Groceries" data-type="want" placeholder="0"/></div>
         <div class="exp-row"><span class="exp-icon">🥗</span><span class="exp-name">Nutrition</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Nutrition" data-type="want" placeholder="0"/></div>
+        <div class="exp-row"><span class="exp-icon">⛽</span><span class="exp-name">Gas</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Gas" data-type="want" placeholder="0"/></div>
         <div class="exp-row"><span class="exp-icon">🍔</span><span class="exp-name">Dining Out</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Dining" data-type="want" placeholder="0"/></div>
         <div class="exp-row"><span class="exp-icon">✈️</span><span class="exp-name">Travel</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Travel" data-type="want" placeholder="0"/></div>
         <div class="exp-row"><span class="exp-icon">🎰</span><span class="exp-name">Sports Betting</span><span class="exp-dollar">$</span><input class="cat-input" type="number" data-cat="Betting" data-type="want" placeholder="0"/></div>
@@ -1099,12 +1100,13 @@ function toggleAcc(header){
   document.getElementById('wishPrice').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('wishAddBtn').click(); });
 
   // -- IMPORT STATEMENT -------------------------------------
-  var BUDGET_CATEGORIES=['Rent','Utilities','Subscriptions','Transport','Groceries','Nutrition','Dining','Travel','Betting','Fitness','Entertainment','Shopping','Business','Savings','Investing','Retirement','Other (not counted)'];
+  var BUDGET_CATEGORIES=['Rent','Utilities','Subscriptions','Transport','Gas','Groceries','Nutrition','Dining','Travel','Betting','Fitness','Entertainment','Shopping','Business','Savings','Investing','Retirement','Other (not counted)'];
   var EXACT_CAT_MAP={
     'shopping':'Shopping','utilities':'Utilities','groceries':'Groceries','rent':'Rent',
     'dining':'Dining','nutrition':'Nutrition','business':'Business','travel':'Travel',
     'fitness':'Fitness','entertainment':'Entertainment','subscriptions':'Subscriptions',
     'subscription':'Subscriptions','transport':'Transport','transportation':'Transport',
+    'gas':'Gas','fuel':'Gas','gas station':'Gas',
     'betting':'Betting','savings':'Savings','investing':'Investing','retirement':'Retirement'
   };
   var AMEX_CAT_MAP={
@@ -1127,7 +1129,8 @@ function toggleAcc(header){
     [/gnc|vitamin shoppe|supplement|protein|nutrition/i,'Nutrition'],
     [/uber eats|doordash|grubhub|restaurant|cafe|coffee|starbucks|chipotle|mcdonald|wendy|pizza|sushi|grill|diner|taco/i,'Dining'],
     [/delta|united|american air|southwest|jetblue|airbnb|marriott|hilton|hyatt|expedia|hotel|airlines/i,'Travel'],
-    [/uber|lyft|shell|chevron|exxon|bp |valero|parking|transit|tolls/i,'Transport'],
+    [/shell|chevron|exxon|bp |valero|sunoco|citgo|mobil|gas station|speedway|wawa|raceway|fuel/i,'Gas'],
+    [/uber|lyft|parking|transit|tolls/i,'Transport'],
     [/netflix|spotify|hulu|disney|hbo|apple\.com\/bill|prime video|youtube premium/i,'Subscriptions'],
     [/planet fitness|equinox|la fitness|crossfit|gym|yoga|peloton/i,'Fitness'],
     [/amazon|target|walmart|best buy|nike|nordstrom|macy|tj maxx|marshalls|zara/i,'Shopping'],
